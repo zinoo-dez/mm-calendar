@@ -20,8 +20,6 @@ const APP_SHELL = [
   './icon-512.png',
   './vendor/flatpickr/flatpickr.min.css',
   './vendor/flatpickr/flatpickr.min.js',
-  '../assets/icon.svg',
-  '../assets/app-icon.svg',
 ];
 
 const FONT_URLS = [
