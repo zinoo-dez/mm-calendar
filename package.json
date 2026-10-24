@@ -1,0 +1,38 @@
+{
+  "name": "myanmar-calendar",
+  "version": "1.0.0",
+  "description": "Production-grade Myanmar Calendar for macOS",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --mac",
+    "dist": "electron-builder --mac dmg"
+  },
+  "keywords": ["myanmar", "calendar", "burmese", "macos"],
+  "author": "Myanmar Calendar App",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.myanmar.calendar",
+    "productName": "Myanmar Calendar",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "target": ["dmg", "zip"]
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "src/**/*",
+      "assets/**/*"
+    ]
+  }
+}
