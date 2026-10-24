@@ -2,20 +2,79 @@
 <html lang="my" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Myanmar Calendar — Production-grade Burmese lunisolar calendar for macOS" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Myanmar Calendar — Production-grade Burmese lunisolar calendar with auspicious date finder, astrology & offline PWA support" />
+  <meta name="theme-color" content="#e8b32f" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Myanmar Cal" />
+  <meta name="format-detection" content="telephone=no" />
   <title>Myanmar Calendar — မြန်မာပြက္ခဒိန်</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Myanmar Calendar — မြန်မာပြက္ခဒိန်" />
+  <meta property="og:description" content="Burmese lunisolar calendar with auspicious date finder, astrology & offline support" />
+  <meta property="og:image" content="icon-512.png" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- macOS Title Bar drag region -->
   <div class="titlebar-drag-region" id="titlebar-drag"></div>
+
+  <!-- PWA Install Prompt Banner -->
+  <div class="pwa-install-banner" id="pwa-install-banner" hidden>
+    <div class="pwa-install-content">
+      <img src="icon-192.png" alt="Myanmar Calendar" width="40" height="40" class="pwa-install-icon" />
+      <div class="pwa-install-text">
+        <strong>Install Myanmar Calendar</strong>
+        <span>Add to home screen for offline access</span>
+      </div>
+    </div>
+    <div class="pwa-install-actions">
+      <button class="pwa-install-btn" id="pwa-install-btn">Install</button>
+      <button class="pwa-dismiss-btn" id="pwa-dismiss-btn">✕</button>
+    </div>
+  </div>
+
+  <!-- Mobile Top Navigation Bar -->
+  <header class="mobile-topbar" id="mobile-topbar">
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="19" y2="6"/>
+        <line x1="3" y1="11" x2="19" y2="11"/>
+        <line x1="3" y1="16" x2="19" y2="16"/>
+      </svg>
+    </button>
+    <div class="mobile-topbar-title">
+      <img src="icon.svg" alt="Myanmar Calendar" width="26" height="26" />
+      <div class="mobile-topbar-title-text">
+        <span class="title-en">Myanmar Calendar</span>
+        <span class="title-mm">မြန်မာပြက္ခဒိန်</span>
+      </div>
+    </div>
+    <button class="mobile-theme-btn" id="mobile-theme-btn" aria-label="Toggle theme">
+      <span id="mobile-theme-icon">☀️</span>
+    </button>
+  </header>
+
+  <!-- Sidebar Backdrop Overlay (mobile) -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <!-- App Shell -->
   <div class="app-shell" id="app">
@@ -25,7 +84,9 @@
       <!-- App Logo -->
       <div class="sidebar-header">
         <div class="app-logo">
-          <div class="logo-icon">🗓️</div>
+          <div class="logo-icon">
+            <img src="icon.svg" alt="Myanmar Calendar Icon" width="34" height="34" />
+          </div>
           <div class="logo-text">
             <span class="logo-name">Myanmar Calendar</span>
             <span class="logo-sub">မြန်မာပြက္ခဒိန်</span>
@@ -284,7 +345,7 @@
             <p class="converter-sub">Enter any Gregorian calendar date to get the exact Myanmar lunisolar date, astrological signs, and Sasana Year.</p>
             <div class="converter-input-group">
               <label>Select Gregorian Date</label>
-              <input type="date" id="gregorian-input" class="date-input" />
+              <input type="text" id="gregorian-input" class="date-input" placeholder="Select date..." readonly />
               <button class="convert-btn" id="convert-to-myanmar">Convert to Myanmar →</button>
             </div>
             <div class="converter-result" id="myanmar-result">
@@ -384,7 +445,7 @@
             <div class="astro-calc-row">
               <div class="astro-input-block">
                 <label>Select Birth Date</label>
-                <input type="date" id="birth-date-input" class="date-input" />
+                <input type="text" id="birth-date-input" class="date-input" placeholder="Select birth date..." readonly />
               </div>
               <div class="astro-input-block">
                 <label>Wednesday Birth Time</label>
@@ -493,6 +554,30 @@
     </main>
   </div>
 
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="mobile-tabbar" id="mobile-tabbar" aria-label="Main navigation">
+    <button class="tab-item active" data-view="month" id="tab-month">
+      <span class="tab-icon">📅</span>
+      <span class="tab-label">Month</span>
+    </button>
+    <button class="tab-item" data-view="year" id="tab-year">
+      <span class="tab-icon">📆</span>
+      <span class="tab-label">Year</span>
+    </button>
+    <button class="tab-item" data-view="finder" id="tab-finder">
+      <span class="tab-icon">✨</span>
+      <span class="tab-label">Finder</span>
+    </button>
+    <button class="tab-item" data-view="converter" id="tab-converter">
+      <span class="tab-icon">🔄</span>
+      <span class="tab-label">Convert</span>
+    </button>
+    <button class="tab-item" data-view="astro" id="tab-astro">
+      <span class="tab-icon">🔮</span>
+      <span class="tab-label">Astro</span>
+    </button>
+  </nav>
+
   <!-- Day Detail Modal -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal glass-card" id="day-modal">
@@ -510,6 +595,20 @@
     <div class="loading-text">Loading Myanmar Calendar...</div>
   </div>
 
+  <!-- Myanmar Calendar Engine (browser fallback for PWA) -->
+  <script src="myanmar-engine.js"></script>
+  <script src="vendor/flatpickr/flatpickr.min.js"></script>
   <script src="app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+          .then(reg => console.log('[PWA] SW registered:', reg.scope))
+          .catch(err => console.warn('[PWA] SW registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>

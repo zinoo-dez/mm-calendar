@@ -1,0 +1,146 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "Myanmar Calendar Design Tokens",
+  "version": "1.1.0",
+  "themes": {
+    "dark": {
+      "elevation": {
+        "canvas": { "$value": "#0B0D13", "$type": "color" },
+        "sidebar": { "$value": "#080A0F", "$type": "color" },
+        "surface1": { "$value": "#131722", "$type": "color" },
+        "surface2": { "$value": "#1A1F2E", "$type": "color" },
+        "surfaceActive": { "$value": "#252118", "$type": "color" },
+        "surfaceActiveGlow": { "$value": "rgba(245, 194, 66, 0.08)", "$type": "color" }
+      },
+      "border": {
+        "subtle": { "$value": "#1E2433", "$type": "color" },
+        "default": { "$value": "#2A3142", "$type": "color" },
+        "highlight": { "$value": "#D4A338", "$type": "color" },
+        "glow": { "$value": "rgba(245, 194, 66, 0.35)", "$type": "color" },
+        "sabbath": { "$value": "rgba(6, 182, 212, 0.45)", "$type": "color" },
+        "nagapor": { "$value": "rgba(236, 72, 153, 0.35)", "$type": "color" }
+      },
+      "typography": {
+        "primary": { "$value": "#F3F4F6", "$type": "color" },
+        "secondary": { "$value": "#9CA3AF", "$type": "color" },
+        "muted": { "$value": "#64748B", "$type": "color" },
+        "gold": { "$value": "#EAB308", "$type": "color" },
+        "goldStrong": { "$value": "#F5C242", "$type": "color" },
+        "onGold": { "$value": "#0B0D13", "$type": "color" }
+      },
+      "brand": {
+        "primary": { "$value": "#F5C242", "$type": "color" },
+        "hover": { "$value": "#F7CE65", "$type": "color" },
+        "subtle": { "$value": "rgba(245, 194, 66, 0.12)", "$type": "color" }
+      },
+      "weekdays": {
+        "sunday": { "$value": "#F87171", "$type": "color" },
+        "saturday": { "$value": "#60A5FA", "$type": "color" }
+      },
+      "astrology": {
+        "yatyaza": {
+          "text": { "$value": "#4ADE80", "$type": "color" },
+          "bg": { "$value": "rgba(34, 197, 94, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(34, 197, 94, 0.35)", "$type": "color" }
+        },
+        "pyathada": {
+          "text": { "$value": "#F87171", "$type": "color" },
+          "bg": { "$value": "rgba(239, 68, 68, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(239, 68, 68, 0.35)", "$type": "color" }
+        },
+        "amyeittasote": {
+          "text": { "$value": "#60A5FA", "$type": "color" },
+          "bg": { "$value": "rgba(96, 165, 250, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(96, 165, 250, 0.35)", "$type": "color" }
+        },
+        "sabbath": {
+          "text": { "$value": "#38BDF8", "$type": "color" },
+          "bg": { "$value": "rgba(56, 189, 248, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(56, 189, 248, 0.35)", "$type": "color" }
+        },
+        "nagapor": {
+          "text": { "$value": "#EC4899", "$type": "color" },
+          "bg": { "$value": "rgba(236, 72, 153, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(236, 72, 153, 0.35)", "$type": "color" }
+        },
+        "holiday": {
+          "text": { "$value": "#FB923C", "$type": "color" },
+          "bg": { "$value": "rgba(251, 146, 60, 0.12)", "$type": "color" },
+          "border": { "$value": "rgba(251, 146, 60, 0.35)", "$type": "color" }
+        }
+      }
+    },
+    "light": {
+      "elevation": {
+        "canvas": { "$value": "#F8FAFC", "$type": "color", "$description": "Cool-alabaster main background" },
+        "sidebar": { "$value": "#F1F5F9", "$type": "color", "$description": "Clean slate-gray sidebar" },
+        "surface1": { "$value": "#FFFFFF", "$type": "color", "$description": "Pure white for calendar cells & cards" },
+        "surface2": { "$value": "#F8FAFC", "$type": "color", "$description": "Out-of-month cells / secondary inputs" },
+        "surfaceSelected": { "$value": "#FFFBEB", "$type": "color", "$description": "Warm ivory for Today (25) & Active nav" },
+        "sidebarHero": { "$value": "#FDFBF7", "$type": "color", "$description": "Clean warm parchment for top date card" }
+      },
+      "border": {
+        "subtle": { "$value": "#E2E8F0", "$type": "color" },
+        "default": { "$value": "#CBD5E1", "$type": "color" },
+        "highlight": { "$value": "#D97706", "$type": "color" },
+        "sabbath": { "$value": "#BAE6FD", "$type": "color" },
+        "nagapor": { "$value": "#FECDD3", "$type": "color" }
+      },
+      "typography": {
+        "primary": { "$value": "#0F172A", "$type": "color" },
+        "secondary": { "$value": "#475569", "$type": "color" },
+        "muted": { "$value": "#94A3B8", "$type": "color" },
+        "gold": { "$value": "#9A6700", "$type": "color" },
+        "goldStrong": { "$value": "#78350F", "$type": "color" },
+        "onGold": { "$value": "#0F172A", "$type": "color" }
+      },
+      "brand": {
+        "primary": { "$value": "#F59E0B", "$type": "color" },
+        "hover": { "$value": "#D97706", "$type": "color" },
+        "subtle": { "$value": "#FEF3C7", "$type": "color" }
+      },
+      "weekdays": {
+        "sunday": { "$value": "#DC2626", "$type": "color" },
+        "saturday": { "$value": "#2563EB", "$type": "color" }
+      },
+      "astrology": {
+        "yatyaza": {
+          "text": { "$value": "#15803D", "$type": "color" },
+          "bg": { "$value": "#DCFCE7", "$type": "color" },
+          "border": { "$value": "#86EFAC", "$type": "color" }
+        },
+        "pyathada": {
+          "text": { "$value": "#B91C1C", "$type": "color" },
+          "bg": { "$value": "#FEE2E2", "$type": "color" },
+          "border": { "$value": "#FCA5A5", "$type": "color" }
+        },
+        "amyeittasote": {
+          "text": { "$value": "#1D4ED8", "$type": "color" },
+          "bg": { "$value": "#DBEAFE", "$type": "color" },
+          "border": { "$value": "#93C5FD", "$type": "color" }
+        },
+        "sabbath": {
+          "text": { "$value": "#0F766E", "$type": "color" },
+          "bg": { "$value": "#CCFBF1", "$type": "color" },
+          "border": { "$value": "#5EEAD4", "$type": "color" }
+        },
+        "nagapor": {
+          "text": { "$value": "#BE185D", "$type": "color" },
+          "bg": { "$value": "#FCE7F3", "$type": "color" },
+          "border": { "$value": "#F9A8D4", "$type": "color" }
+        },
+        "holiday": {
+          "text": { "$value": "#9A3412", "$type": "color" },
+          "bg": { "$value": "#FFEDD5", "$type": "color" },
+          "border": { "$value": "#FDBA74", "$type": "color" }
+        }
+      },
+      "widget": {
+        "infoBg": { "$value": "#EFF6FF", "$type": "color" },
+        "infoBorder": { "$value": "#BFDBFE", "$type": "color" },
+        "infoTitle": { "$value": "#1D4ED8", "$type": "color" },
+        "infoText": { "$value": "#1E40AF", "$type": "color" }
+      }
+    }
+  }
+}

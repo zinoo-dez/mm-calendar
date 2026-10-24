@@ -7,10 +7,19 @@
     "start": "electron .",
     "dev": "electron . --dev",
     "test": "node tests/engine.test.js",
-    "build": "electron-builder --mac",
-    "dist": "electron-builder --mac dmg"
+    "build": "electron-builder --mac --dir",
+    "dist": "electron-builder --mac dmg",
+    "open:app": "open \"dist/mac-arm64/Myanmar Calendar.app\"",
+    "install:mac": "cp -R \"dist/mac-arm64/Myanmar Calendar.app\" /Applications/ && open \"/Applications/Myanmar Calendar.app\"",
+    "pwa:serve": "npx -y http-server renderer -p 8080 -c-1 --cors -o",
+    "build:engine": "node scripts/build-browser-engine.js"
   },
-  "keywords": ["myanmar", "calendar", "burmese", "macos"],
+  "keywords": [
+    "myanmar",
+    "calendar",
+    "burmese",
+    "macos"
+  ],
   "author": "Myanmar Calendar App",
   "license": "MIT",
   "devDependencies": {
@@ -23,7 +32,10 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "assets/icon.icns",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "directories": {
       "output": "dist"
@@ -35,5 +47,8 @@
       "src/**/*",
       "assets/**/*"
     ]
+  },
+  "dependencies": {
+    "flatpickr": "^4.6.13"
   }
 }

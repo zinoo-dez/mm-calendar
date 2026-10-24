@@ -7,94 +7,268 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&display=swap');
 
 /* ── CSS Custom Properties ───────────────────────────────────── */
-:root {
-  /* Core palette — Dark theme (default) */
-  --bg-primary:       #0d0f14;
-  --bg-secondary:     #13161e;
-  --bg-tertiary:      #1a1e2a;
-  --bg-card:          rgba(255,255,255,0.04);
-  --bg-card-hover:    rgba(255,255,255,0.07);
-  --bg-glass:         rgba(255,255,255,0.06);
-  --bg-glass-border:  rgba(255,255,255,0.10);
+:root,
+[data-theme="dark"] {
+  /* ── Backgrounds & Surfaces (Elevation System) ── */
+  --bg-canvas:                 #0B0D13;
+  --bg-sidebar:                #080A0F;
+  --bg-surface-1:              #131722;
+  --bg-surface-2:              #1A1F2E;
+  --bg-surface-selected:       rgba(245, 194, 66, 0.08);
+  --bg-surface-selected-solid: #252118;
+  --bg-sidebar-hero:           linear-gradient(135deg, rgba(244,185,66,0.15) 0%, rgba(232,160,32,0.08) 100%);
 
-  /* Myanmar gold accent */
-  --accent-primary:   #f4b942;
-  --accent-glow:      rgba(244,185,66,0.25);
-  --accent-secondary: #e8a020;
-  --accent-tertiary:  #ffd770;
+  /* ── Card & Glass Surfaces ── */
+  --bg-card:                   #131722;
+  --bg-card-hover:             #1A1F2E;
+  --bg-glass:                  rgba(19, 23, 34, 0.75);
+  --bg-glass-border:           var(--border-subtle);
 
-  /* Text */
-  --text-primary:     #f0f2f8;
-  --text-secondary:   #8b92a8;
-  --text-muted:       #555e78;
-  --text-accent:      #f4b942;
+  /* ── Legacy Background Aliases ── */
+  --bg-primary:                var(--bg-canvas);
+  --bg-secondary:              var(--bg-surface-1);
+  --bg-tertiary:               var(--bg-surface-2);
 
-  /* Status colors */
-  --yatyaza-color:    #4ade80;
-  --yatyaza-bg:       rgba(74, 222, 128, 0.12);
-  --pyathada-color:   #f87171;
-  --pyathada-bg:      rgba(248, 113, 113, 0.12);
-  --amyeittasote-color: #60a5fa;
-  --amyeittasote-bg:  rgba(96, 165, 250, 0.12);
-  --warameittugyi-color: #a78bfa;
-  --warameittugyi-bg: rgba(167, 139, 250, 0.12);
-  --holiday-color:    #fb923c;
-  --holiday-bg:       rgba(251, 146, 60, 0.12);
-  --nagapor-color:    #ec4899;
-  --nagapor-bg:       rgba(236, 72, 153, 0.12);
-  --sabbath-color:    #06b6d4;
-  --sabbath-bg:       rgba(6, 182, 212, 0.12);
-  --yatpote-color:    #f97316;
-  --yatpote-bg:       rgba(249, 115, 22, 0.12);
-  --full-moon-color:  #facc15;
-  --new-moon-color:   #64748b;
+  /* ── Borders & Dividers ── */
+  --border-subtle:             #1E2433;
+  --border-default:            #2A3142;
+  --border-highlight:          #ae801d;
+  --border-glow:               rgba(245, 194, 66, 0.574);
+  --border-sabbath:            rgba(6, 182, 212, 0.45);
+  --border-nagapor:            rgba(236, 72, 153, 0.35);
 
-  /* Moon colors */
-  --moon-waxing:      #93c5fd;
-  --moon-full:        #facc15;
-  --moon-waning:      #a78bfa;
-  --moon-new:         #64748b;
+  /* ── Typography ── */
+  --text-primary:              #F3F4F6;
+  --text-secondary:            #9CA3AF;
+  --text-muted:                #64748B;
+  --text-gold:                 #c69607;
+  --text-accent:               #ecb73a;
+  --text-gold-strong:          var(--accent-primary);
+  --text-on-gold:              #0B0D13;
 
-  /* Sidebar */
-  --sidebar-width:    280px;
-  --sidebar-bg:       rgba(10,12,18,0.95);
+  /* ── Myanmar Imperial Gold Accent ── */
+  --accent-primary:            #e8b32f;
+  --accent-primary-hover:      #F7CE65;
+  --accent-primary-subtle:     rgba(245, 194, 66, 0.12);
+  --accent-glow:               rgba(245, 194, 66, 0.30);
+  --accent-secondary:          #d3a312;
+  --accent-tertiary:           #edbd45;
 
-  /* Layout */
-  --titlebar-height:  40px;
-  --border-radius:    12px;
-  --border-radius-lg: 18px;
-  --border-radius-xl: 24px;
+  /* ── Calendar Header Days ── */
+  --day-sunday:                #F87171;
+  --day-saturday:              #60A5FA;
 
-  /* Shadows */
-  --shadow-sm:        0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md:        0 4px 16px rgba(0,0,0,0.4);
-  --shadow-lg:        0 8px 32px rgba(0,0,0,0.5);
-  --shadow-glow:      0 0 24px var(--accent-glow);
+  /* ── Semantic Status Colors ── */
+  --status-success-text:       #4ADE80;
+  --status-success-bg:         rgba(34, 197, 94, 0.12);
+  --status-success-border:     rgba(34, 197, 94, 0.35);
 
-  /* Transitions */
-  --transition-fast:  0.15s ease;
-  --transition-med:   0.25s ease;
-  --transition-slow:  0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --status-warning-text:       #F87171;
+  --status-warning-bg:         rgba(239, 68, 68, 0.12);
+  --status-warning-border:     rgba(239, 68, 68, 0.35);
 
-  /* Typography */
-  --font-primary:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-myanmar:     'Noto Sans Myanmar', 'Inter', sans-serif;
+  --status-info-text:          #38BDF8;
+  --status-info-bg:            rgba(56, 189, 248, 0.10);
+  --status-info-border:        rgba(56, 189, 248, 0.30);
+
+  /* ── Semantic Astrological Pills (Dark Theme) ── */
+  --pill-yatyaza-text:         #4ADE80;
+  --pill-yatyaza-bg:           rgba(34, 197, 94, 0.12);
+  --pill-yatyaza-border:       rgba(34, 197, 94, 0.35);
+  --yatyaza-color:             var(--pill-yatyaza-text);
+  --yatyaza-bg:                var(--pill-yatyaza-bg);
+  --yatyaza-border:            var(--pill-yatyaza-border);
+
+  --pill-pyathada-text:        #F87171;
+  --pill-pyathada-bg:          rgba(239, 68, 68, 0.12);
+  --pill-pyathada-border:      rgba(239, 68, 68, 0.35);
+  --pyathada-color:            var(--pill-pyathada-text);
+  --pyathada-bg:               var(--pill-pyathada-bg);
+  --pyathada-border:           var(--pill-pyathada-border);
+
+  --pill-amyeittasote-text:    #60A5FA;
+  --pill-amyeittasote-bg:      rgba(96, 165, 250, 0.12);
+  --pill-amyeittasote-border:  rgba(96, 165, 250, 0.35);
+  --amyeittasote-color:        var(--pill-amyeittasote-text);
+  --amyeittasote-bg:           var(--pill-amyeittasote-bg);
+  --amyeittasote-border:       var(--pill-amyeittasote-border);
+
+  --pill-sabbath-text:         #38BDF8;
+  --pill-sabbath-bg:           rgba(56, 189, 248, 0.12);
+  --pill-sabbath-border:       rgba(56, 189, 248, 0.35);
+  --sabbath-color:             var(--pill-sabbath-text);
+  --sabbath-bg:                var(--pill-sabbath-bg);
+  --sabbath-border:            var(--pill-sabbath-border);
+
+  --pill-nagapor-text:         #EC4899;
+  --pill-nagapor-bg:           rgba(236, 72, 153, 0.12);
+  --pill-nagapor-border:       rgba(236, 72, 153, 0.35);
+  --nagapor-color:             var(--pill-nagapor-text);
+  --nagapor-bg:                var(--pill-nagapor-bg);
+  --nagapor-border:            var(--pill-nagapor-border);
+
+  --pill-holiday-text:         #FB923C;
+  --pill-holiday-bg:           rgba(251, 146, 60, 0.12);
+  --pill-holiday-border:       rgba(251, 146, 60, 0.35);
+  --holiday-color:             var(--pill-holiday-text);
+  --holiday-bg:                var(--pill-holiday-bg);
+  --holiday-border:            var(--pill-holiday-border);
+
+  --warameittugyi-color:       #a78bfa;
+  --warameittugyi-bg:          rgba(167, 139, 250, 0.12);
+  --yatpote-color:             #f97316;
+  --yatpote-bg:                rgba(249, 115, 22, 0.12);
+  --full-moon-color:           #facc15;
+  --new-moon-color:            #64748b;
+
+  /* ── Thingyan Countdown Widget ── */
+  --widget-info-bg:            linear-gradient(135deg, rgba(96,165,250,0.1) 0%, rgba(59,130,246,0.05) 100%);
+  --widget-info-border:        rgba(96, 165, 250, 0.2);
+  --widget-info-title:         #60A5FA;
+  --widget-info-text:          var(--text-secondary);
+
+  /* ── Moon Colors ── */
+  --moon-waxing:               #93c5fd;
+  --moon-full:                 #facc15;
+  --moon-waning:               #a78bfa;
+  --moon-new:                  #64748b;
+
+  /* ── Sidebar ── */
+  --sidebar-width:             280px;
+  --sidebar-bg:                var(--bg-sidebar);
+
+  /* ── Layout ── */
+  --titlebar-height:           40px;
+  --border-radius:             12px;
+  --border-radius-lg:          18px;
+  --border-radius-xl:          24px;
+
+  /* ── Shadows ── */
+  --shadow-sm:                 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:                 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg:                 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-glow:               0 0 24px var(--accent-glow);
+
+  /* ── Transitions ── */
+  --transition-fast:           0.15s ease;
+  --transition-med:            0.25s ease;
+  --transition-slow:           0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Typography Fonts ── */
+  --font-primary:              'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-myanmar:              'Noto Sans Myanmar', 'Inter', sans-serif;
 }
 
-/* Light theme */
-[data-theme="light"] {
-  --bg-primary:       #f4f5f7;
-  --bg-secondary:     #ffffff;
-  --bg-tertiary:      #ebedf2;
-  --bg-card:          rgba(255,255,255,0.8);
-  --bg-card-hover:    rgba(255,255,255,1);
-  --bg-glass:         rgba(255,255,255,0.7);
-  --bg-glass-border:  rgba(0,0,0,0.08);
-  --text-primary:     #1a1d26;
-  --text-secondary:   #555e78;
-  --text-muted:       #8b92a8;
-  --sidebar-bg:       rgba(240,241,245,0.98);
-  --bg-card-hover:    rgba(0,0,0,0.03);
+/* ── Light Theme ─────────────────────────────────────────────── */
+[data-theme="light"],
+:root[data-theme="light"] {
+  /* 1. Backgrounds & Surfaces */
+  --bg-canvas:                 #F8FAFC;            /* Subtle cool-alabaster main background */
+  --bg-sidebar:                #F1F5F9;           /* Distinct, clean slate-gray sidebar */
+  --bg-surface-1:              #FFFFFF;           /* Pure white for calendar cells & cards */
+  --bg-surface-2:              #F8FAFC;           /* Out-of-month cells / secondary inputs */
+  --bg-surface-selected:       #FFFBEB;           /* Warm ivory for "Today" (25) & Active nav */
+  --bg-sidebar-hero:           #FDFBF7;           /* Clean warm parchment for top date card */
+
+  /* Legacy & Surface Aliases */
+  --bg-primary:                var(--bg-canvas);
+  --bg-secondary:              var(--bg-surface-1);
+  --bg-tertiary:               var(--bg-surface-2);
+  --bg-card:                   var(--bg-surface-1);
+  --bg-card-hover:             #F1F5F9;
+  --bg-glass:                  rgba(255, 255, 255, 0.90);
+  --bg-glass-border:           var(--border-subtle);
+  --sidebar-bg:                var(--bg-sidebar);
+
+  /* 2. Borders & Dividers */
+  --border-subtle:             #E2E8F0;           /* Standard calendar cell border */
+  --border-default:            #CBD5E1;           /* Buttons, inputs, hover states */
+  --border-highlight:          #D97706;           /* "Today" cell (25) & Active sidebar border */
+  --border-sabbath:            #BAE6FD;           /* Soft sky border for Full/New Moon cells */
+  --border-nagapor:            #FECDD3;           /* Soft rose border (replaces neon pink) */
+  --border-glow:               rgba(217, 119, 6, 0.25);
+
+  /* 3. Typography (WCAG AA/AAA Compliant) */
+  --text-primary:              #0F172A;           /* Deep slate-black for dates & titles */
+  --text-secondary:            #475569;           /* Medium slate for Myanmar lunar text (လဆန်း) */
+  --text-muted:                #94A3B8;           /* Out-of-month dates (27-30) & captions */
+  --text-gold:                 #9A6700;           /* Deep Bronze-Gold for readable accent text! */
+  --text-accent:               #9A6700;
+  --text-gold-strong:          #78350F;           /* Active nav text ("Monthly View") */
+  --text-on-gold:              #0F172A;           /* Dark text on the "Today" yellow button */
+
+  /* 4. Primary Brand / Myanmar Gold */
+  --accent-primary:            #F59E0B;           /* "Today" button fill & primary badges */
+  --accent-primary-hover:      #D97706;           /* Button hover state */
+  --accent-primary-subtle:     #FEF3C7;           /* Soft gold pill background (2570 BE badge) */
+  --accent-glow:               rgba(245, 158, 11, 0.25);
+  --accent-secondary:          #D97706;
+  --accent-tertiary:           #FDE68A;
+
+  /* 5. Calendar Header Days */
+  --day-sunday:                #DC2626;           /* Crisp Crimson for SUN & Sunday dates */
+  --day-saturday:              #2563EB;           /* Royal Blue for SAT & Saturday dates */
+
+  /* 6. Semantic Astrological Pills (High-Contrast Text + Soft Fill) */
+  /* Yatyaza (ရက်ရာဇာ - Green) */
+  --pill-yatyaza-text:         #15803D;
+  --pill-yatyaza-bg:           #DCFCE7;
+  --pill-yatyaza-border:       #86EFAC;
+  --yatyaza-color:             var(--pill-yatyaza-text);
+  --yatyaza-bg:                var(--pill-yatyaza-bg);
+  --yatyaza-border:            var(--pill-yatyaza-border);
+
+  /* Pyathada (ပြဿဒါး - Coral Red) */
+  --pill-pyathada-text:        #B91C1C;
+  --pill-pyathada-bg:          #FEE2E2;
+  --pill-pyathada-border:      #FCA5A5;
+  --pyathada-color:            var(--pill-pyathada-text);
+  --pyathada-bg:               var(--pill-pyathada-bg);
+  --pyathada-border:           var(--pill-pyathada-border);
+
+  /* Amyeittasote (အမြိတ္တစုတ် - Blue) */
+  --pill-amyeittasote-text:    #1D4ED8;
+  --pill-amyeittasote-bg:      #DBEAFE;
+  --pill-amyeittasote-border:  #93C5FD;
+  --amyeittasote-color:        var(--pill-amyeittasote-text);
+  --amyeittasote-bg:           var(--pill-amyeittasote-bg);
+  --amyeittasote-border:       var(--pill-amyeittasote-border);
+
+  /* Sabbath / Eve (ဥပုသ် / အဖိတ် - Teal/Cyan) */
+  --pill-sabbath-text:         #0F766E;
+  --pill-sabbath-bg:           #CCFBF1;
+  --pill-sabbath-border:       #5EEAD4;
+  --sabbath-color:             var(--pill-sabbath-text);
+  --sabbath-bg:                var(--pill-sabbath-bg);
+  --sabbath-border:            var(--pill-sabbath-border);
+
+  /* Nagapor (နဂါးပေါ် - Rose/Magenta) */
+  --pill-nagapor-text:         #BE185D;
+  --pill-nagapor-bg:           #FCE7F3;
+  --pill-nagapor-border:       #F9A8D4;
+  --nagapor-color:             var(--pill-nagapor-text);
+  --nagapor-bg:                var(--pill-nagapor-bg);
+  --nagapor-border:            var(--pill-nagapor-border);
+
+  /* Holiday / Festival (Thadingyut - Amber/Orange) */
+  --pill-holiday-text:         #9A3412;
+  --pill-holiday-bg:           #FFEDD5;
+  --pill-holiday-border:       #FDBA74;
+  --holiday-color:             var(--pill-holiday-text);
+  --holiday-bg:                var(--pill-holiday-bg);
+  --holiday-border:            var(--pill-holiday-border);
+
+  /* 7. Thingyan Countdown Widget */
+  --widget-info-bg:            #EFF6FF;
+  --widget-info-border:        #BFDBFE;
+  --widget-info-title:         #1D4ED8;
+  --widget-info-text:          #1E40AF;
+
+  /* Shadows for Light Theme */
+  --shadow-sm:                 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md:                 0 4px 14px -2px rgba(0, 0, 0, 0.08);
+  --shadow-lg:                 0 10px 25px -3px rgba(0, 0, 0, 0.10);
+  --shadow-glow:               0 0 16px rgba(245, 158, 11, 0.20);
 }
 
 /* ── Reset & Base ─────────────────────────────────────────────── */
@@ -180,9 +354,21 @@ html, body {
 }
 
 .logo-icon {
-  font-size: 28px;
-  filter: drop-shadow(0 0 8px var(--accent-glow));
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 10px var(--accent-glow));
   animation: float 4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.logo-icon img,
+.logo-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
 }
 @keyframes float {
   0%, 100% { transform: translateY(0); }
@@ -208,15 +394,13 @@ html, body {
 .today-card {
   margin: 16px;
   padding: 18px;
-  background: linear-gradient(135deg,
-    rgba(244,185,66,0.15) 0%,
-    rgba(232,160,32,0.08) 100%
-  );
-  border: 1px solid rgba(244,185,66,0.25);
+  background: var(--bg-sidebar-hero);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-lg);
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 .today-card::before {
   content: '';
@@ -227,6 +411,9 @@ html, body {
   height: 200%;
   background: radial-gradient(circle at 50% 50%, rgba(244,185,66,0.08), transparent 70%);
   animation: pulse-glow 4s ease-in-out infinite;
+}
+[data-theme="light"] .today-card::before {
+  display: none;
 }
 @keyframes pulse-glow {
   0%, 100% { transform: scale(0.8); opacity: 0.5; }
@@ -325,18 +512,15 @@ html, body {
 .thingyan-card {
   margin: 0 16px 12px;
   padding: 14px;
-  background: linear-gradient(135deg,
-    rgba(96,165,250,0.1) 0%,
-    rgba(59,130,246,0.05) 100%
-  );
-  border: 1px solid rgba(96,165,250,0.2);
+  background: var(--widget-info-bg);
+  border: 1px solid var(--widget-info-border);
   border-radius: var(--border-radius);
   text-align: center;
 }
 .thingyan-label {
   font-size: 10px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--widget-info-text, var(--text-secondary));
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -344,13 +528,13 @@ html, body {
 .thingyan-countdown {
   font-size: 24px;
   font-weight: 800;
-  color: #60a5fa;
+  color: var(--widget-info-title, #60a5fa);
   line-height: 1;
   margin-bottom: 4px;
 }
 .thingyan-date {
   font-size: 10px;
-  color: var(--text-secondary);
+  color: var(--widget-info-text, var(--text-secondary));
 }
 
 /* ── Sidebar Navigation ──────────────────────────────────────── */
@@ -368,7 +552,7 @@ html, body {
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--border-radius);
   background: transparent;
   color: var(--text-secondary);
@@ -388,12 +572,10 @@ html, body {
 }
 
 .nav-btn.active {
-  background: linear-gradient(135deg,
-    rgba(244,185,66,0.15),
-    rgba(244,185,66,0.08)
-  );
-  color: var(--accent-primary);
-  border: 1px solid rgba(244,185,66,0.2);
+  background: var(--bg-surface-selected);
+  color: var(--text-gold-strong, var(--accent-primary));
+  border: 1px solid var(--border-highlight);
+  font-weight: 600;
 }
 
 .nav-icon { font-size: 16px; }
@@ -512,7 +694,7 @@ html, body {
   background: var(--accent-primary);
   border: none;
   border-radius: 20px;
-  color: #000;
+  color: var(--text-on-gold, #000);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -520,7 +702,7 @@ html, body {
   -webkit-app-region: no-drag;
 }
 .today-btn:hover {
-  background: var(--accent-tertiary);
+  background: var(--accent-primary-hover, var(--accent-tertiary));
   transform: scale(1.03);
   box-shadow: 0 0 16px var(--accent-glow);
 }
@@ -581,8 +763,8 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
-.weekday-header:first-child { color: var(--pyathada-color); }
-.weekday-header:last-child  { color: #60a5fa; }
+.weekday-header:first-child { color: var(--day-sunday); }
+.weekday-header:last-child  { color: var(--day-saturday); }
 .weekday-mm {
   display: block;
   font-family: var(--font-myanmar);
@@ -643,34 +825,35 @@ html, body {
 
 [data-theme="light"] .calendar-day.today,
 [data-theme="light"] .cal-day.today {
-  background: linear-gradient(135deg,
-    rgba(217, 119, 6, 0.16) 0%,
-    rgba(217, 119, 6, 0.06) 100%
-  ) !important;
-  border: 2px solid #d97706 !important;
-  box-shadow: 0 0 14px rgba(217, 119, 6, 0.3), inset 0 0 8px rgba(217, 119, 6, 0.08) !important;
+  background: var(--bg-surface-selected) !important;
+  border: 2px solid var(--border-highlight) !important;
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.25), inset 0 0 8px rgba(217, 119, 6, 0.08) !important;
 }
 
 .calendar-day.other-month,
 .cal-day.other-month {
-  opacity: 0.25;
+  opacity: 0.50;
   cursor: default;
-  background: rgba(255, 255, 255, 0.01);
-  border-color: transparent;
+  background: var(--bg-surface-2);
+  border-color: var(--border-subtle);
+}
+.calendar-day.other-month .day-num,
+.cal-day.other-month .day-num {
+  color: var(--text-muted);
 }
 .calendar-day.other-month:hover,
 .cal-day.other-month:hover {
   transform: none;
-  background: rgba(255, 255, 255, 0.01);
-  border-color: transparent;
+  background: var(--bg-surface-2);
+  border-color: var(--border-subtle);
   box-shadow: none;
 }
 
 .calendar-day.weekend .day-num:not(.today-num),
-.cal-day.weekend .day-num:not(.today-num) { color: #60a5fa; }
+.cal-day.weekend .day-num:not(.today-num) { color: var(--day-saturday); }
 
 .calendar-day.sunday .day-num:not(.today-num),
-.cal-day.sunday .day-num:not(.today-num)  { color: var(--pyathada-color); }
+.cal-day.sunday .day-num:not(.today-num)  { color: var(--day-sunday); }
 
 .calendar-day.selected,
 .cal-day.selected {
@@ -703,7 +886,7 @@ html, body {
 
 .day-num.today-num {
   background: var(--accent-primary);
-  color: #0d0f14 !important;
+  color: var(--text-on-gold, #0d0f14) !important;
   font-weight: 800;
   border-radius: 50%;
   width: 26px;
@@ -712,13 +895,13 @@ html, body {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  box-shadow: 0 2px 8px rgba(244, 185, 66, 0.45);
+  box-shadow: 0 2px 8px var(--accent-glow);
 }
 
 [data-theme="light"] .day-num.today-num {
-  background: #d97706;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.45);
+  background: var(--accent-primary);
+  color: var(--text-on-gold, #0F172A) !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
 }
 
 .today-pill {
@@ -735,9 +918,9 @@ html, body {
 }
 
 [data-theme="light"] .today-pill {
-  background: rgba(217, 119, 6, 0.18);
-  color: #b45309;
-  border-color: rgba(217, 119, 6, 0.4);
+  background: var(--accent-primary-subtle);
+  color: var(--text-gold);
+  border-color: var(--border-highlight);
 }
 
 .day-moon-icon,
@@ -763,7 +946,7 @@ html, body {
 
 [data-theme="light"] .calendar-day.today .day-myanmar-num,
 [data-theme="light"] .cal-day.today .day-myanmar-num {
-  color: #b45309;
+  color: var(--border-highlight);
 }
 
 .day-myanmar-sub,
@@ -854,11 +1037,11 @@ html, body {
 /* Sabbath & Nagapor Cell Borders */
 .calendar-day.nagapor:not(.today),
 .cal-day.nagapor:not(.today) {
-  border-color: rgba(236, 72, 153, 0.35);
+  border-color: var(--border-nagapor);
 }
 .calendar-day.sabbath:not(.today),
 .cal-day.sabbath:not(.today) {
-  box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.45);
+  box-shadow: inset 0 0 0 1px var(--border-sabbath);
 }
 
 /* ── Day Detail Panel ─────────────────────────────────────────── */
@@ -908,72 +1091,129 @@ html, body {
   overflow-y: auto;
   padding: 16px 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
   align-content: start;
 }
 
-.mini-month {
+.mini-month,
+.year-month-card {
   background: var(--bg-card);
   border: 1px solid var(--bg-glass-border);
   border-radius: var(--border-radius-lg);
-  padding: 14px;
+  padding: 14px 14px 12px 14px;
   cursor: pointer;
   transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
 }
-.mini-month:hover {
+
+.mini-month:hover,
+.year-month-card:hover {
   background: var(--bg-card-hover);
-  border-color: var(--accent-primary);
+  border-color: rgba(244, 185, 66, 0.45);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
-.mini-month-title {
-  font-size: 13px;
+
+.mini-month-header,
+.year-month-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-month-title,
+.year-month-header h4 {
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 2px;
+  margin: 0;
+  letter-spacing: 0.2px;
 }
-.mini-month-mm {
-  font-size: 10px;
+
+.mini-month-mm,
+.year-month-mm {
+  font-size: 11px;
   font-family: var(--font-myanmar);
   color: var(--accent-primary);
-  margin-bottom: 10px;
+  font-weight: 500;
 }
-.mini-grid {
+
+.mini-grid,
+.mini-calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
+  gap: 2px 2px;
+  width: 100%;
 }
+
 .mini-day-header {
-  font-size: 8px;
+  font-size: 9px;
+  font-weight: 700;
   color: var(--text-muted);
   text-align: center;
-  padding: 2px 0;
+  padding: 2px 0 6px 0;
+  text-transform: uppercase;
 }
-.mini-day-header:first-child { color: var(--pyathada-color); }
-.mini-day-header:last-child  { color: #60a5fa; }
+.mini-day-header.sunday,
+.mini-day-header:first-child { color: var(--day-sunday); }
+.mini-day-header.saturday,
+.mini-day-header:last-child  { color: var(--day-saturday); }
 
 .mini-day {
-  font-size: 9px;
-  text-align: center;
-  padding: 2px 1px;
+  font-size: 10px;
+  font-weight: 500;
+  height: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
   color: var(--text-secondary);
   position: relative;
+  user-select: none;
+  transition: all var(--transition-fast);
 }
+
+.mini-day.empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mini-day:not(.empty):hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.mini-day.sunday-mini { color: var(--day-sunday); }
+.mini-day.saturday-mini { color: var(--day-saturday); }
+.mini-day.has-holiday { color: var(--holiday-color); font-weight: 700; }
+
 .mini-day.today,
 .mini-day.today-mini {
   background: var(--accent-primary) !important;
-  color: #0d0f14 !important;
+  color: var(--text-on-gold, #0d0f14) !important;
   font-weight: 800 !important;
   border-radius: 50% !important;
-  box-shadow: 0 0 8px rgba(244, 185, 66, 0.5);
+  box-shadow: 0 0 10px var(--accent-glow) !important;
 }
-.mini-day.has-holiday { color: var(--holiday-color); }
-.mini-day.has-full-moon { color: var(--full-moon-color); }
-.mini-day.other-m { opacity: 0.3; }
-.mini-day.sunday-mini { color: var(--pyathada-color); }
-.mini-day.saturday-mini { color: #60a5fa; }
+
+.mini-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+}
+.mini-dot.holiday   { background: var(--holiday-color); }
+.mini-dot.yatyaza   { background: var(--yatyaza-color); }
+.mini-dot.pyathada  { background: var(--pyathada-color); }
+.mini-dot.full-moon { background: var(--full-moon-color); }
+.mini-dot.sabbath   { background: var(--sabbath-color); }
 
 /* ── Converter ────────────────────────────────────────────────── */
 .converter-container {
@@ -1009,24 +1249,31 @@ html, body {
 }
 
 .date-input {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--bg-glass-border);
+  background: var(--bg-surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8b32f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") no-repeat calc(100% - 12px) center;
+  border: 1px solid var(--border-default);
   border-radius: var(--border-radius);
-  padding: 10px 14px;
+  padding: 10px 38px 10px 14px;
   color: var(--text-primary);
   font-size: 13px;
+  font-weight: 500;
   font-family: var(--font-primary);
   outline: none;
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-fast);
   -webkit-app-region: no-drag;
-  user-select: text;
+  cursor: pointer;
+  width: 100%;
 }
-.date-input:focus {
+.date-input:hover {
+  border-color: var(--border-highlight);
+  background-color: var(--bg-card-hover);
+}
+.date-input:focus,
+.date-input.active {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(244,185,66,0.15);
+  box-shadow: 0 0 0 3px var(--accent-primary-subtle);
 }
 .date-input option {
-  background: var(--bg-tertiary);
+  background: var(--bg-surface-2);
   color: var(--text-primary);
 }
 
@@ -1625,10 +1872,13 @@ html, body {
 
 /* ── Auspicious Date Finder View ─────────────────────────────── */
 .finder-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 20px 28px 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 1100px;
 }
 
 .finder-card {
@@ -1759,6 +2009,7 @@ html, body {
   background: var(--bg-card);
   border: 1px solid var(--bg-glass-border);
   backdrop-filter: blur(10px);
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 .finder-result-item:hover {
@@ -2005,5 +2256,815 @@ html, body {
 @keyframes toastIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Custom Flatpickr Date Picker Theme (Dark Obsidian & Gold)
+   ═══════════════════════════════════════════════════════════════ */
+
+.flatpickr-calendar {
+  background: var(--bg-surface-1) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.55), 0 0 20px var(--accent-glow) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  font-family: var(--font-primary) !important;
+  padding: 12px 14px !important;
+  width: 310px !important;
+  overflow: hidden !important;
+  animation: fpFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+}
+
+@keyframes fpFadeIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.flatpickr-calendar::before,
+.flatpickr-calendar::after {
+  display: none !important;
+}
+
+/* Header Month & Navigation */
+.flatpickr-months {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 4px 4px 10px !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  background: transparent !important;
+  position: relative !important;
+}
+
+.flatpickr-months .flatpickr-month {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+  height: 36px !important;
+}
+
+.flatpickr-current-month {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  padding: 0 !important;
+  width: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  background: var(--bg-surface-2) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+  padding: 5px 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: border-color var(--transition-fast) !important;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+  border-color: var(--accent-primary) !important;
+}
+
+.flatpickr-current-month .numInputWrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 72px !important;
+  border-radius: 8px !important;
+}
+
+.flatpickr-current-month input.cur-year {
+  background: var(--bg-surface-2) !important;
+  color: var(--text-gold, var(--accent-primary)) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 8px !important;
+  padding: 5px 6px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  outline: none !important;
+  transition: border-color var(--transition-fast) !important;
+}
+.flatpickr-current-month input.cur-year:focus {
+  border-color: var(--accent-primary) !important;
+}
+
+.flatpickr-current-month .numInputWrapper span.arrowUp,
+.flatpickr-current-month .numInputWrapper span.arrowDown {
+  border-color: var(--border-subtle) !important;
+}
+.flatpickr-current-month .numInputWrapper span.arrowUp:after {
+  border-bottom-color: var(--text-secondary) !important;
+}
+.flatpickr-current-month .numInputWrapper span.arrowDown:after {
+  border-top-color: var(--text-secondary) !important;
+}
+
+/* Arrow Navigation */
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+  background: var(--bg-surface-2) !important;
+  color: var(--text-primary) !important;
+  fill: var(--text-primary) !important;
+  border: 1px solid var(--border-subtle) !important;
+  cursor: pointer !important;
+  transition: all var(--transition-fast) !important;
+}
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--accent-primary) !important;
+  fill: var(--accent-primary) !important;
+  transform: scale(1.06);
+}
+
+/* Weekday Row */
+.flatpickr-weekdays {
+  padding: 8px 0 4px !important;
+  background: transparent !important;
+}
+span.flatpickr-weekday {
+  color: var(--text-muted) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+span.flatpickr-weekday:first-child {
+  color: var(--day-sunday) !important;
+}
+span.flatpickr-weekday:last-child {
+  color: var(--day-saturday) !important;
+}
+
+/* Days Container */
+.flatpickr-days {
+  width: 100% !important;
+}
+.dayContainer {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  gap: 2px !important;
+  padding: 4px 0 !important;
+}
+
+/* Day Tiles */
+.flatpickr-day {
+  border-radius: 8px !important;
+  color: var(--text-primary) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  max-width: 38px !important;
+  border: 1px solid transparent !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.flatpickr-day:hover {
+  background: var(--bg-surface-2) !important;
+  border-color: var(--border-default) !important;
+  transform: scale(1.05);
+}
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: var(--text-muted) !important;
+  opacity: 0.35 !important;
+}
+
+.flatpickr-day.today {
+  border: 1.5px solid var(--border-highlight) !important;
+  background: var(--bg-surface-selected) !important;
+  color: var(--text-gold, var(--accent-primary)) !important;
+  font-weight: 700 !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-on-gold, #0B0D13) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 10px var(--accent-glow) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE-FIRST PWA STYLES  v2.1
+   Mobile navigation: top bar + bottom tab bar + slide-in sidebar
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Mobile Top Bar ───────────────────────────────────────────── */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(56px + env(safe-area-inset-top, 0px));
+  z-index: 500;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.mobile-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+  flex: 1;
+  justify-content: center;
+}
+.mobile-topbar-title img {
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+  object-fit: contain;
+}
+.mobile-topbar-title-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.mobile-topbar-title-text .title-en {
+  font-size: 14px;
+  font-weight: 700;
+}
+.mobile-topbar-title-text .title-mm {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent-primary);
+  font-family: var(--font-myanmar);
+}
+.mobile-menu-btn,
+.mobile-theme-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-menu-btn:active,
+.mobile-theme-btn:active {
+  transform: scale(0.88);
+  background: var(--bg-surface-selected);
+}
+
+/* ── Sidebar Drawer Overlay (mobile) ─────────────────────────── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 490;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.sidebar-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Mobile Bottom Tab Bar ────────────────────────────────────── */
+.mobile-tabbar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border-subtle);
+  flex-direction: row;
+  align-items: stretch;
+  z-index: 500;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 8px 2px;
+  transition: color 0.2s ease, background 0.15s ease;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-item::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 2.5px;
+  background: var(--accent-primary);
+  border-radius: 0 0 4px 4px;
+  transform: scaleX(0);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tab-item.active {
+  color: var(--accent-primary);
+}
+.tab-item.active::after {
+  transform: scaleX(1);
+}
+.tab-item:active {
+  transform: scale(0.92);
+}
+.tab-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.tab-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+/* ── PWA Install Banner ───────────────────────────────────────── */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-surface-1);
+  border-top: 1px solid var(--border-subtle);
+  padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 800;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.35);
+  animation: slide-up-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pwa-install-banner[hidden] { display: none !important; }
+
+@keyframes slide-up-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.pwa-install-content {
+  display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;
+}
+.pwa-install-icon {
+  width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+}
+.pwa-install-text {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.pwa-install-text strong { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.pwa-install-text span   { font-size: 12px; color: var(--text-secondary); }
+.pwa-install-actions     { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pwa-install-btn {
+  background: var(--accent-primary);
+  color: var(--text-on-gold);
+  border: none; border-radius: 10px; padding: 9px 20px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pwa-install-btn:active { transform: scale(0.94); }
+.pwa-dismiss-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--bg-surface-2); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.2s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE  ≤ 768px
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Show mobile chrome ──────────────────────────────────────── */
+  .mobile-topbar    { display: flex; }
+  .mobile-tabbar    { display: flex; }
+  .sidebar-backdrop { display: block; }
+  .titlebar-drag-region { display: none; }
+
+  /* ── Global overflow guard ──────────────────────────────────── */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* ── App shell: single-column, content between top & bottom bar  */
+  .app-shell {
+    display: block !important;
+    height: 100dvh;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding-top: calc(56px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Sidebar → slide-in drawer ──────────────────────────────── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(300px, 88vw);
+    height: 100dvh;
+    z-index: 510;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid var(--border-default);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+  }
+  .sidebar.drawer-open {
+    transform: translateX(0);
+    box-shadow: 6px 0 40px rgba(0,0,0,0.6);
+  }
+
+  /* Desktop sidebar nav hidden — mobile uses bottom tab bar */
+  .sidebar-nav    { display: none !important; }
+  .sidebar-footer {
+    position: sticky; bottom: 0;
+    background: var(--bg-sidebar);
+    border-top: 1px solid var(--border-subtle);
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+  }
+
+  /* ── Main content: full-width, scrollable, no horizontal overflow */
+  .main-content {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    box-sizing: border-box !important;
+  }
+
+  /* ── View sections: constrained to viewport ─────────────────── */
+  .view {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Cards and glass cards: no overflow ─────────────────────── */
+  .glass-card,
+  .converter-card,
+  .result-card,
+  .astro-card,
+  .day-detail-panel {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Headings: wrap long text instead of overflowing ────────── */
+  .month-title,
+  .view h1, .view h2, .view h3 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* ── View header: clean stack with breathing room ───────────── */
+  .view-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 16px 14px 10px;
+  }
+  .month-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .month-title   { font-size: 22px; }
+  .month-subtitle { font-size: 11px; margin-top: 2px; }
+  #export-month-ics { display: none !important; }
+
+  /* ── Month Legend: horizontal scroll, no wrap ───────────────── */
+  .month-legend {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 10px 8px !important;
+    gap: 12px !important;
+    scrollbar-width: none;
+  }
+  .month-legend::-webkit-scrollbar { display: none; }
+  .legend-item {
+    flex-shrink: 0;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  /* ── Calendar container — clean padding ────────────────────── */
+  .calendar-container { padding: 0 10px 12px; }
+  .calendar-weekdays  { gap: 4px; padding: 0 2px 4px; }
+  .weekday-header {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 4px;
+    letter-spacing: 0.3px;
+  }
+  .weekday-mm { display: none; }
+
+  /* ── Calendar grid: square cells ────────────────────────────── */
+  .calendar-grid {
+    gap: 4px !important;
+    padding: 2px 0 !important;
+  }
+  .calendar-day,
+  .cal-day {
+    /* Square cells via aspect-ratio */
+    aspect-ratio: 1 / 1 !important;
+    min-height: unset !important;
+    padding: 6px 5px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+  }
+
+  /* ── Day number row ─────────────────────────────────────────── */
+  .day-number-row { margin-bottom: 1px !important; }
+  .day-num {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+  }
+  .day-num.today-num {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 12px !important;
+  }
+  .day-moon-icon, .day-moon { font-size: 10px !important; }
+  .today-pill { display: none !important; }
+
+  /* ── Myanmar numerals ───────────────────────────────────────── */
+  .day-myanmar-num {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.1 !important;
+  }
+  .day-myanmar-sub, .day-myanmar {
+    font-size: 7px !important;
+    margin-bottom: 1px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* ── Cell dots: 6px circles, capped at 3 dots ──────────────── */
+  .day-tags-container {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+    margin-top: auto !important;
+    padding-top: 1px !important;
+    max-width: 100% !important;
+  }
+  .cell-tag {
+    font-size: 0 !important;
+    padding: 0 !important;
+    width: 6px !important;
+    height: 6px !important;
+    min-width: 6px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    flex-shrink: 0 !important;
+  }
+  /* Colored dots */
+  .cell-tag.yatyaza        { background: var(--yatyaza-color) !important; }
+  .cell-tag.pyathada       { background: var(--pyathada-color) !important; }
+  .cell-tag.amyeittasote   { background: var(--amyeittasote-color) !important; }
+  .cell-tag.nagapor        { background: var(--nagapor-color) !important; }
+  .cell-tag.holiday        { background: var(--holiday-color) !important; }
+  .cell-tag.sabbath        { background: var(--sabbath-color) !important; }
+  .cell-tag.sabbath-eve    { background: var(--sabbath-color) !important; opacity: 0.7; }
+  .cell-tag.warameittugyi  { background: var(--warameittugyi-color) !important; }
+
+  /* ── Year view: 2 columns ───────────────────────────────────── */
+  .year-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+  .mini-calendar-grid { gap: 1px; }
+  .mini-day-num { font-size: 9px !important; }
+
+  /* ── Finder / Astrology: single column (correct class names) ── */
+  .finder-layout,
+  .astro-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+    padding: 10px;
+  }
+  .purpose-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .result-card  { padding: 12px; }
+
+  /* ── Converter: stack cards vertically ──────────────────────── */
+  .converter-container {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+    gap: 12px !important;
+  }
+  /* Divider: horizontal between stacked cards */
+  .converter-divider {
+    flex-direction: row !important;
+    padding: 0 !important;
+  }
+  .converter-divider .divider-line {
+    height: 1px !important;
+    width: auto !important;
+    flex: 1 !important;
+  }
+  /* Inner Myanmar year+month row: also stack */
+  .converter-row,
+  .moon-input-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .converter-card { padding: 16px !important; }
+
+  /* ── Astrology mansion grid: single column, horizontal cards ─── */
+  .mansions-grid,
+  .mansion-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+
+  /* Horizontal card layout: icon+name left, description right */
+  .mansion-card {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    padding: 12px 14px !important;
+    gap: 12px !important;
+  }
+  /* Left column: house name + Myanmar name */
+  .mansion-card .mansion-house-name { font-size: 13px !important; }
+  .mansion-card .mansion-house-mm   { font-size: 13px !important; margin: 1px 0 4px !important; }
+  .mansion-card .mansion-theme {
+    font-size: 9px !important;
+    text-align: left !important;
+  }
+  .mansion-card .mansion-ruler {
+    font-size: 10px !important;
+    text-align: left !important;
+  }
+  /* Birth house badge repositioned */
+  .birth-house-badge {
+    top: -9px !important;
+    left: 12px !important;
+  }
+
+  /* ── Nakhat zodiac grid: 4 columns ─────────────────────────── */
+  .nakhat-grid   { grid-template-columns: repeat(4, 1fr) !important; gap: 4px !important; }
+  .nakhat-animal { font-size: 16px !important; }
+  .nakhat-name   { font-size: 8px !important; }
+
+
+  /* ── Modal: bottom sheet on mobile ─────────────────────────── */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 88dvh;
+    overflow-y: auto;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ── Toast: above bottom tab bar ──────────────────────────────*/
+  .toast-container {
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ── PWA banner: above bottom tab bar ───────────────────────── */
+  .pwa-install-banner {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EXTRA SMALL  ≤ 390px (iPhone SE, small Android)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 390px) {
+  .app-shell {
+    padding-top: calc(50px + env(safe-area-inset-top, 0px));
+  }
+  .mobile-topbar {
+    height: calc(50px + env(safe-area-inset-top, 0px));
+  }
+  .mobile-topbar-title .title-en { font-size: 13px; }
+
+  .month-title  { font-size: 18px; }
+  /* Square cells — no min-height override needed */
+  .calendar-day,
+  .cal-day {
+    aspect-ratio: 1 / 1 !important;
+    padding: 4px 4px !important;
+    border-radius: 8px !important;
+  }
+  .day-num       { font-size: 12px !important; }
+  .day-myanmar-num { font-size: 10px !important; }
+  .day-myanmar-sub, .day-myanmar { font-size: 6px !important; }
+  .cell-tag {
+    width: 5px !important;
+    height: 5px !important;
+    min-width: 5px !important;
+  }
+  .calendar-container { padding: 0 6px 10px; }
+  .calendar-grid { gap: 3px !important; }
+
+  /* Hide tab labels on very small screens */
+  .tab-label { display: none; }
+  .tab-icon  { font-size: 24px; }
+  .mobile-tabbar { height: calc(52px + env(safe-area-inset-bottom, 0px)); }
+  .app-shell { padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)); }
+
+  .year-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TABLET  769px – 1024px
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root { --sidebar-width: 240px; }
+  .year-grid { grid-template-columns: repeat(3, 1fr); }
+  .calendar-day, .cal-day { min-height: 72px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DESKTOP  > 768px — hide all mobile chrome
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .mobile-topbar  { display: none !important; }
+  .mobile-tabbar  { display: none !important; }
+  .sidebar-backdrop { display: none !important; }
+}
+
+/* ── Light theme overrides for mobile chrome ─────────────────── */
+[data-theme="light"] .mobile-topbar,
+[data-theme="light"] .mobile-tabbar {
+  background: var(--bg-sidebar);
+  border-color: var(--border-subtle);
+}
+[data-theme="light"] .pwa-install-banner {
+  background: var(--bg-surface-1);
+  border-color: var(--border-subtle);
 }
 

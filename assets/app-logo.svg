@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <defs>
+    <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F2E"/>
+      <stop offset="100%" stop-color="#0B0D13"/>
+    </linearGradient>
+
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5D1"/>
+      <stop offset="25%" stop-color="#FDE074"/>
+      <stop offset="65%" stop-color="#F5C242"/>
+      <stop offset="100%" stop-color="#C28410"/>
+    </linearGradient>
+
+    <linearGradient id="textGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F5C451"/>
+      <stop offset="100%" stop-color="#EAB308"/>
+    </linearGradient>
+
+    <radialGradient id="logoGlow" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#F5C242" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#F5C242" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="logoDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Group for Icon Mark (Left) -->
+  <g transform="translate(8, 8)" filter="url(#logoDropShadow)">
+    <!-- Icon Container Squircle -->
+    <rect x="0" y="0" width="64" height="64" rx="16"
+          fill="url(#logoBgGrad)"
+          stroke="#D4A338" stroke-width="1.2" stroke-opacity="0.6"/>
+
+    <!-- Subtle Radial Glow -->
+    <circle cx="32" cy="32" r="26" fill="url(#logoGlow)"/>
+
+    <!-- Calendar Top Clips -->
+    <rect x="20" y="7" width="4" height="7" rx="2" fill="url(#logoGold)"/>
+    <rect x="40" y="7" width="4" height="7" rx="2" fill="url(#logoGold)"/>
+    <line x1="12" y1="18" x2="52" y2="18" stroke="#D4A338" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+
+    <!-- Crescent Moon Symbol -->
+    <path d="M 32 19
+             C 41 19 46 25 46 33
+             C 46 41 40 47 32 47
+             C 38 43 40 37 40 33
+             C 40 27 36 22 32 19 Z"
+          fill="url(#logoGold)"/>
+
+    <!-- Pagoda Spire -->
+    <path d="M 27 49 L 37 49 L 35 46 L 29 46 Z" fill="url(#logoGold)"/>
+    <path d="M 29 46 C 29 41 35 41 35 46 Z" fill="url(#logoGold)"/>
+    <line x1="32" y1="41" x2="32" y2="25" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+    <ellipse cx="32" cy="30" rx="4" ry="1.2" fill="url(#logoGold)"/>
+    <ellipse cx="32" cy="27" rx="3" ry="1" fill="url(#logoGold)"/>
+    <circle cx="32" cy="23" r="1.3" fill="#FFFFFF"/>
+
+    <!-- Bottom Status Dots -->
+    <circle cx="23" cy="54" r="1.8" fill="#4ADE80"/>
+    <circle cx="32" cy="54" r="2.2" fill="url(#logoGold)"/>
+    <circle cx="41" cy="54" r="1.8" fill="#38BDF8"/>
+  </g>
+
+  <!-- Typography Brand Lockup (Right) -->
+  <g transform="translate(86, 14)">
+    <!-- Primary App Title (English) -->
+    <text x="0" y="24"
+          font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', sans-serif"
+          font-size="20"
+          font-weight="700"
+          letter-spacing="-0.3"
+          fill="#F3F4F6">
+      Myanmar Calendar
+    </text>
+
+    <!-- Subtitle (Myanmar Script & Era) -->
+    <text x="0" y="44"
+          font-family="'Noto Sans Myanmar', -apple-system, sans-serif"
+          font-size="13"
+          font-weight="600"
+          fill="url(#textGold)">
+      မြန်မာပြက္ခဒိန်
+    </text>
+
+    <!-- Version / ME Badge -->
+    <g transform="translate(118, 32)">
+      <rect x="0" y="0" width="70" height="16" rx="4"
+            fill="rgba(245, 194, 66, 0.12)"
+            stroke="rgba(212, 163, 56, 0.4)" stroke-width="0.8"/>
+      <text x="35" y="11.5"
+            font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif"
+            font-size="9"
+            font-weight="700"
+            letter-spacing="0.5"
+            fill="#F5C242"
+            text-anchor="middle">
+        1388 ME
+      </text>
+    </g>
+  </g>
+</svg>

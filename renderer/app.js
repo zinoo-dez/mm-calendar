@@ -5,6 +5,40 @@
    Complete implementation of all domain knowledge features
    ═══════════════════════════════════════════════════════════════ */
 
+// ─── Browser Engine Polyfill (PWA / non-Electron fallback) ───────────────────
+// When running as a PWA or plain browser (no Electron IPC), wire up the
+// in-browser MyanmarCalendarEngine as window.myanmarCalendar so the rest
+// of the app works identically without any code changes.
+if (typeof window.myanmarCalendar === 'undefined' && typeof window.MyanmarCalendarEngine !== 'undefined') {
+  const _e = window.MyanmarCalendarEngine;
+  window.myanmarCalendar = {
+    getMyanmarDate: (dateStr) => Promise.resolve(_e.getMyanmarDate(dateStr || undefined)),
+    getMonthData: (year, month) => Promise.resolve(_e.getMonthData(year, month)),
+    getYearData: (year) => Promise.resolve(_e.getYearData(year)),
+    getThingyanCountdown: () => Promise.resolve(_e.getThingyanCountdown()),
+    getHolidays: (year, month) => Promise.resolve(_e.getMyanmarHolidays(year, month)),
+    getToday: () => {
+      const t = new Date();
+      return Promise.resolve({ year: t.getFullYear(), month: t.getMonth() + 1, day: t.getDate(), isoString: t.toISOString() });
+    },
+    findAuspiciousDates: (purpose, year, month, count) => Promise.resolve(_e.findAuspiciousDates(purpose, year, month, count || 10)),
+    exportIcal: (year) => Promise.resolve({ success: false, canceled: true, reason: 'PWA mode: download not supported via IPC' }),
+    get8MansionChart: (my, weekday, isWednesdayPM) => Promise.resolve(_e.get8MansionChart(my, weekday, isWednesdayPM)),
+    convertMyanmarToGregorian: (my, mm, md) => {
+      const g = _e.convertMyanmarToGregorian(my, mm, md);
+      return Promise.resolve({ gregorian: g, myanmarDate: _e.getMyanmarDate(new Date(g.year, g.month - 1, g.day)) });
+    },
+    sendNotification: (options) => {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(options.title || 'Myanmar Calendar', { body: options.body || '', icon: './icon-192.png' });
+      }
+      return Promise.resolve({ sent: true });
+    },
+  };
+  console.log('[PWA] Browser engine polyfill loaded — running offline-capable mode');
+}
+
+
 // ─── State ────────────────────────────────────────────────────────────────────
 const state = {
   currentView: 'month',
@@ -85,11 +119,57 @@ async function init() {
   // Auto trigger initial Auspicious Finder search
   searchAuspiciousDates();
 
+  // Initialize Modern Flatpickr Date Pickers
+  initDatePickers();
+
   // Hide loading overlay
   setTimeout(() => {
     const overlay = $('loading-overlay');
     if (overlay) overlay.classList.add('hidden');
   }, 400);
+}
+
+function initDatePickers() {
+  if (typeof flatpickr !== 'undefined') {
+    // 1. Birth Date Picker for Mahabote
+    const birthEl = $('birth-date-input');
+    if (birthEl) {
+      flatpickr(birthEl, {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'F j, Y',
+        altInputClass: 'date-input date-input-flatpickr',
+        defaultDate: '1996-10-25',
+        maxDate: 'today',
+        animate: true,
+        disableMobile: true,
+        monthSelectorType: 'dropdown',
+        onChange: function(selectedDates, dateStr) {
+          if (dateStr) calculateMahaboteChart();
+        }
+      });
+      calculateMahaboteChart();
+    }
+
+    // 2. Gregorian to Myanmar Converter Date Picker
+    const gregEl = $('gregorian-input');
+    if (gregEl) {
+      flatpickr(gregEl, {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'F j, Y',
+        altInputClass: 'date-input date-input-flatpickr',
+        defaultDate: 'today',
+        animate: true,
+        disableMobile: true,
+        monthSelectorType: 'dropdown',
+        onChange: function(selectedDates, dateStr) {
+          if (dateStr) convertToMyanmar();
+        }
+      });
+      convertToMyanmar();
+    }
+  }
 }
 
 function populateYearSelectors() {
@@ -587,7 +667,7 @@ async function searchAuspiciousDates() {
       `;
 
       item.addEventListener('click', async () => {
-        const fullDate = await window.myanmarCalendar.getMyanmarDate(new Date(res.date).toISOString());
+        const fullDate = await window.myanmarCalendar.getMyanmarDate(res.date);
         showDayModal(fullDate);
       });
 
@@ -605,7 +685,7 @@ async function convertToMyanmar() {
   if (!input) return;
 
   try {
-    const info = await window.myanmarCalendar.getMyanmarDate(new Date(input).toISOString());
+    const info = await window.myanmarCalendar.getMyanmarDate(input);
     if (!info || !info.myanmar) {
       $('myanmar-result').innerHTML = '<div style="color:var(--pyathada-color)">Conversion failed</div>';
       return;
@@ -751,6 +831,21 @@ async function exportIcal(year) {
     const res = await window.myanmarCalendar.exportIcal(year);
     if (res && res.success) {
       showToast(`✅ Exported Myanmar holidays to: ${res.filePath}`);
+    } else if (res && res.canceled && res.reason) {
+      // PWA mode — generate ICS and trigger browser download
+      if (typeof window.MyanmarCalendarEngine !== 'undefined') {
+        const icsData = window.MyanmarCalendarEngine.generateIcsCalendar(year);
+        const blob = new Blob([icsData], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `myanmar-holidays-${year}.ics`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`✅ Downloaded myanmar-holidays-${year}.ics`);
+      }
     } else if (res && !res.canceled) {
       showToast('⚠️ Export canceled or failed');
     }
@@ -864,8 +959,14 @@ function showToast(msg) {
 // ─── View Switching ───────────────────────────────────────────────────────────
 
 function switchView(viewName) {
+  // Sync desktop sidebar nav buttons
   $$('.nav-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === viewName);
+  });
+
+  // Sync mobile bottom tab bar
+  $$('.tab-item').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.view === viewName);
   });
 
   $$('.view').forEach(v => {
@@ -883,6 +984,9 @@ function switchView(viewName) {
   if (viewName === 'finder') {
     searchAuspiciousDates();
   }
+
+  // Auto-close drawer on mobile after navigating
+  closeMobileDrawer();
 }
 
 // ─── Theme Toggle ─────────────────────────────────────────────────────────────
@@ -898,8 +1002,28 @@ function updateThemeUI() {
   const isDark = state.theme === 'dark';
   const icon = $('theme-icon');
   const label = $('theme-label');
+  const mobileIcon = $('mobile-theme-icon');
   if (icon) icon.textContent = isDark ? '☀️' : '🌙';
   if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  if (mobileIcon) mobileIcon.textContent = isDark ? '☀️' : '🌙';
+}
+
+// ─── Mobile Drawer Helpers ────────────────────────────────────────────────────
+
+function openMobileDrawer() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = $('sidebar-backdrop');
+  if (sidebar) sidebar.classList.add('drawer-open');
+  if (backdrop) backdrop.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileDrawer() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = $('sidebar-backdrop');
+  if (sidebar) sidebar.classList.remove('drawer-open');
+  if (backdrop) backdrop.classList.remove('visible');
+  document.body.style.overflow = '';
 }
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
@@ -1043,6 +1167,53 @@ function setupEventListeners() {
   }
   setInterval(checkDateRollover, 30000);
   window.addEventListener('focus', checkDateRollover);
+
+  // ── Mobile Navigation ───────────────────────────────────────────────
+
+  // Bottom tab bar
+  $$('.tab-item').forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  // Hamburger menu: open sidebar drawer
+  $('mobile-menu-btn')?.addEventListener('click', openMobileDrawer);
+  $('sidebar-backdrop')?.addEventListener('click', closeMobileDrawer);
+
+  // Mobile theme toggle
+  $('mobile-theme-btn')?.addEventListener('click', toggleTheme);
+
+  // ── PWA Install Prompt ──────────────────────────────────────────────
+  let _pwaInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _pwaInstallPrompt = e;
+    const banner = $('pwa-install-banner');
+    if (banner && !localStorage.getItem('pwa-install-dismissed')) {
+      banner.removeAttribute('hidden');
+    }
+  });
+
+  $('pwa-install-btn')?.addEventListener('click', async () => {
+    if (!_pwaInstallPrompt) return;
+    _pwaInstallPrompt.prompt();
+    const { outcome } = await _pwaInstallPrompt.userChoice;
+    _pwaInstallPrompt = null;
+    $('pwa-install-banner').setAttribute('hidden', '');
+    if (outcome === 'accepted') {
+      showToast('✅ Myanmar Calendar installed!');
+    }
+  });
+
+  $('pwa-dismiss-btn')?.addEventListener('click', () => {
+    $('pwa-install-banner').setAttribute('hidden', '');
+    localStorage.setItem('pwa-install-dismissed', '1');
+  });
+
+  window.addEventListener('appinstalled', () => {
+    $('pwa-install-banner')?.setAttribute('hidden', '');
+    showToast('🎉 Myanmar Calendar installed successfully!');
+  });
 }
 
 // Year View Rendering
@@ -1051,31 +1222,60 @@ function renderYearView(data) {
   if (!container || !data || !data.months) return;
   container.innerHTML = '';
 
+  const miniWeekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
   data.months.forEach(m => {
     const monthCard = document.createElement('div');
-    monthCard.className = 'year-month-card glass-card';
+    monthCard.className = 'mini-month year-month-card glass-card';
 
     let daysHtml = '';
+
+    // Weekday headers
+    miniWeekdays.forEach((wd, i) => {
+      const cls = (i === 0) ? 'sunday' : (i === 6) ? 'saturday' : '';
+      daysHtml += `<div class="mini-day-header ${cls}">${wd}</div>`;
+    });
+
+    // Leading empty days for first day of week
+    for (let i = 0; i < m.firstDayOfWeek; i++) {
+      daysHtml += `<div class="mini-day empty"></div>`;
+    }
+
+    // Days of the month
     m.days.forEach(d => {
+      const isSunday = d.gregorian.weekday === 0;
+      const isSaturday = d.gregorian.weekday === 6;
+      const hasHoliday = d.holidays && d.holidays.length > 0;
+      const isFullMoon = d.myanmar && d.myanmar.moonPhase === 1;
+      const isSabbath = d.auspicious && d.auspicious.sabbath === 1;
+
+      let classes = ['mini-day'];
+      if (d.isToday) classes.push('today', 'today-mini');
+      if (isSunday) classes.push('sunday-mini');
+      if (isSaturday) classes.push('saturday-mini');
+      if (hasHoliday) classes.push('has-holiday');
+
       let dotCls = '';
-      if (d.auspicious.isYatyaza) dotCls = 'yatyaza';
-      else if (d.auspicious.isPyathada) dotCls = 'pyathada';
-      else if (d.holidays && d.holidays.length > 0) dotCls = 'holiday';
+      if (hasHoliday) dotCls = 'holiday';
+      else if (isFullMoon) dotCls = 'full-moon';
+      else if (isSabbath) dotCls = 'sabbath';
+      else if (d.auspicious && d.auspicious.isYatyaza) dotCls = 'yatyaza';
+      else if (d.auspicious && d.auspicious.isPyathada) dotCls = 'pyathada';
 
       daysHtml += `
-        <div class="mini-day${d.isToday ? ' today' : ''}" title="${d.formatted.myanmarDateMM}">
-          ${d.gregorian.day}
+        <div class="${classes.join(' ')}" title="${d.gregorian.day} ${GREGORIAN_MONTHS[m.month - 1]} — ${d.formatted.myanmarDateMM}">
+          <span class="mini-day-num">${d.gregorian.day}</span>
           ${dotCls ? `<span class="mini-dot ${dotCls}"></span>` : ''}
         </div>
       `;
     });
 
     monthCard.innerHTML = `
-      <div class="year-month-header">
-        <h4>${GREGORIAN_MONTHS[m.month - 1]}</h4>
-        <span class="year-month-mm">${m.primaryMMMonthMM}</span>
+      <div class="mini-month-header year-month-header">
+        <h4 class="mini-month-title">${GREGORIAN_MONTHS[m.month - 1]}</h4>
+        <span class="mini-month-mm year-month-mm">${m.primaryMMMonthMM}</span>
       </div>
-      <div class="mini-calendar-grid">
+      <div class="mini-grid mini-calendar-grid">
         ${daysHtml}
       </div>
     `;

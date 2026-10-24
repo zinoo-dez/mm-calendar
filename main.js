@@ -288,6 +288,18 @@ ipcMain.handle('send-notification', (event, options) => {
 
 // ─── App Lifecycle ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  // Set macOS Dock Icon dynamically (works for both dev mode and production)
+  if (process.platform === 'darwin' && app.dock) {
+    const iconPath = path.join(__dirname, 'assets', 'icon.png');
+    if (fs.existsSync(iconPath)) {
+      try {
+        app.dock.setIcon(iconPath);
+      } catch (e) {
+        console.error('Failed to set dock icon:', e);
+      }
+    }
+  }
+
   createWindow();
   createTray();
 
