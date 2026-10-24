@@ -3169,18 +3169,21 @@ span.flatpickr-weekday:last-child {
   .nakhat-name   { font-size: 8px !important; }
 
 
-  /* ── Modal: bottom sheet on mobile ─────────────────────────── */
+  /* ── Modal: centered floating box on mobile ────────────────── */
   .modal-overlay {
-    align-items: flex-end;
-    padding: 0;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
   }
   .modal {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 20px 20px 0 0;
-    max-height: 88dvh;
-    overflow-y: auto;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    width: min(92vw, 440px) !important;
+    max-width: 440px !important;
+    border-radius: 20px !important;
+    max-height: 82dvh !important;
+    overflow-y: auto !important;
+    padding: 24px 18px !important;
+    margin: auto !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--bg-glass-border) !important;
   }
 
   /* ── Toast: above bottom tab bar ──────────────────────────────*/
