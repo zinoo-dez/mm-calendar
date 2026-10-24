@@ -40,6 +40,12 @@
   --warameittugyi-bg: rgba(167, 139, 250, 0.12);
   --holiday-color:    #fb923c;
   --holiday-bg:       rgba(251, 146, 60, 0.12);
+  --nagapor-color:    #ec4899;
+  --nagapor-bg:       rgba(236, 72, 153, 0.12);
+  --sabbath-color:    #06b6d4;
+  --sabbath-bg:       rgba(6, 182, 212, 0.12);
+  --yatpote-color:    #f97316;
+  --yatpote-bg:       rgba(249, 115, 22, 0.12);
   --full-moon-color:  #facc15;
   --new-moon-color:   #64748b;
 
@@ -598,111 +604,261 @@ html, body {
 }
 
 /* Calendar Day Cell */
+.calendar-day,
 .cal-day {
   background: var(--bg-card);
-  border: 1px solid transparent;
+  border: 1px solid var(--bg-glass-border);
   border-radius: var(--border-radius);
-  padding: 6px 7px;
+  padding: 8px 8px;
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
-  min-height: 80px;
+  min-height: 84px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   -webkit-app-region: no-drag;
 }
 
+.calendar-day:hover,
 .cal-day:hover {
   background: var(--bg-card-hover);
-  border-color: var(--bg-glass-border);
+  border-color: rgba(244, 185, 66, 0.35);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
 
+/* Today Highlight — High visual prominence */
+.calendar-day.today,
 .cal-day.today {
   background: linear-gradient(135deg,
-    rgba(244,185,66,0.15),
-    rgba(244,185,66,0.06)
-  );
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 12px rgba(244,185,66,0.15);
+    rgba(244, 185, 66, 0.22) 0%,
+    rgba(244, 185, 66, 0.08) 100%
+  ) !important;
+  border: 2px solid var(--accent-primary) !important;
+  box-shadow: 0 0 18px rgba(244, 185, 66, 0.35), inset 0 0 12px rgba(244, 185, 66, 0.10) !important;
+  z-index: 2;
 }
 
-.cal-day.other-month {
-  opacity: 0.3;
-  cursor: default;
+[data-theme="light"] .calendar-day.today,
+[data-theme="light"] .cal-day.today {
+  background: linear-gradient(135deg,
+    rgba(217, 119, 6, 0.16) 0%,
+    rgba(217, 119, 6, 0.06) 100%
+  ) !important;
+  border: 2px solid #d97706 !important;
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.3), inset 0 0 8px rgba(217, 119, 6, 0.08) !important;
 }
-.cal-day.other-month:hover {
-  transform: none;
-  background: var(--bg-card);
+
+.calendar-day.other-month,
+.cal-day.other-month {
+  opacity: 0.25;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.01);
   border-color: transparent;
 }
+.calendar-day.other-month:hover,
+.cal-day.other-month:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.01);
+  border-color: transparent;
+  box-shadow: none;
+}
 
-.cal-day.weekend .day-num { color: #60a5fa; }
-.cal-day.sunday .day-num  { color: var(--pyathada-color); }
+.calendar-day.weekend .day-num:not(.today-num),
+.cal-day.weekend .day-num:not(.today-num) { color: #60a5fa; }
 
+.calendar-day.sunday .day-num:not(.today-num),
+.cal-day.sunday .day-num:not(.today-num)  { color: var(--pyathada-color); }
+
+.calendar-day.selected,
 .cal-day.selected {
   border-color: var(--accent-primary);
-  background: rgba(244,185,66,0.08);
+  background: rgba(244, 185, 66, 0.12);
+  outline: 2px solid rgba(244, 185, 66, 0.6);
+  outline-offset: -2px;
 }
 
-/* Day Indicators */
-.day-indicators {
+/* Day Number Row & Today Badge */
+.day-number-row {
   display: flex;
-  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 3px;
-  flex-wrap: wrap;
 }
-.day-indicator {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
+
+.day-num-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
-.day-indicator.yatyaza    { background: var(--yatyaza-color); }
-.day-indicator.pyathada   { background: var(--pyathada-color); }
-.day-indicator.amyeittasote { background: var(--amyeittasote-color); }
-.day-indicator.holiday    { background: var(--holiday-color); }
-.day-indicator.warameittugyi { background: var(--warameittugyi-color); }
 
 .day-num {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;
-  margin-bottom: 2px;
-}
-.cal-day.today .day-num {
-  color: var(--accent-primary);
 }
 
+.day-num.today-num {
+  background: var(--accent-primary);
+  color: #0d0f14 !important;
+  font-weight: 800;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(244, 185, 66, 0.45);
+}
+
+[data-theme="light"] .day-num.today-num {
+  background: #d97706;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.45);
+}
+
+.today-pill {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(244, 185, 66, 0.25);
+  color: var(--accent-primary);
+  border: 1px solid rgba(244, 185, 66, 0.4);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+[data-theme="light"] .today-pill {
+  background: rgba(217, 119, 6, 0.18);
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.4);
+}
+
+.day-moon-icon,
+.day-moon {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.day-myanmar-num {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-myanmar);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.calendar-day.today .day-myanmar-num,
+.cal-day.today .day-myanmar-num {
+  color: var(--accent-primary);
+  font-weight: 800;
+}
+
+[data-theme="light"] .calendar-day.today .day-myanmar-num,
+[data-theme="light"] .cal-day.today .day-myanmar-num {
+  color: #b45309;
+}
+
+.day-myanmar-sub,
 .day-myanmar {
   font-size: 10px;
   font-family: var(--font-myanmar);
-  color: var(--text-secondary);
-  line-height: 1.3;
-  flex: 1;
-}
-
-.day-moon {
-  font-size: 11px;
-  position: absolute;
-  top: 5px;
-  right: 6px;
-  opacity: 0.7;
-}
-.day-moon.full  { opacity: 1; filter: drop-shadow(0 0 3px var(--full-moon-color)); }
-.day-moon.new   { opacity: 0.5; }
-
-.day-holiday-label {
-  font-size: 8px;
-  color: var(--holiday-color);
+  color: var(--text-muted);
   line-height: 1.2;
-  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.calendar-day.today .day-myanmar-sub,
+.cal-day.today .day-myanmar-sub {
+  color: var(--text-secondary);
+}
+
+/* Day Badges & Tag Containers */
+.day-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: auto;
+  padding-top: 3px;
+}
+
+.cell-tag {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1.5px 5px;
+  border-radius: 4px;
+  font-family: var(--font-myanmar);
+  line-height: 1.3;
   white-space: nowrap;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 1px solid transparent;
+}
+
+.cell-tag.yatyaza {
+  background: var(--yatyaza-bg);
+  color: var(--yatyaza-color);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.cell-tag.pyathada {
+  background: var(--pyathada-bg);
+  color: var(--pyathada-color);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cell-tag.amyeittasote {
+  background: var(--amyeittasote-bg);
+  color: var(--amyeittasote-color);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.cell-tag.warameittugyi {
+  background: var(--warameittugyi-bg);
+  color: var(--warameittugyi-color);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.cell-tag.nagapor {
+  background: var(--nagapor-bg);
+  color: var(--nagapor-color);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.cell-tag.sabbath {
+  background: var(--sabbath-bg);
+  color: var(--sabbath-color);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.cell-tag.sabbath-eve {
+  background: rgba(6, 182, 212, 0.08);
+  color: #67e8f9;
+  border-color: rgba(6, 182, 212, 0.25);
+}
+
+.cell-tag.holiday {
+  background: var(--holiday-bg);
+  color: var(--holiday-color);
+  border-color: rgba(244, 185, 66, 0.3);
+}
+
+/* Sabbath & Nagapor Cell Borders */
+.calendar-day.nagapor:not(.today),
+.cal-day.nagapor:not(.today) {
+  border-color: rgba(236, 72, 153, 0.35);
+}
+.calendar-day.sabbath:not(.today),
+.cal-day.sabbath:not(.today) {
+  box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.45);
 }
 
 /* ── Day Detail Panel ─────────────────────────────────────────── */
@@ -805,11 +961,13 @@ html, body {
   color: var(--text-secondary);
   position: relative;
 }
+.mini-day.today,
 .mini-day.today-mini {
-  background: var(--accent-primary);
-  color: #000;
-  font-weight: 700;
-  border-radius: 50%;
+  background: var(--accent-primary) !important;
+  color: #0d0f14 !important;
+  font-weight: 800 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 8px rgba(244, 185, 66, 0.5);
 }
 .mini-day.has-holiday { color: var(--holiday-color); }
 .mini-day.has-full-moon { color: var(--full-moon-color); }
@@ -1339,3 +1497,513 @@ html, body {
   .moon-guide-grid { grid-template-columns: repeat(2, 1fr); }
   .ausp-guide-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Phase 2 Production Enhancements Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Today Card Enhancements ─────────────────────────────────── */
+.today-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.sasana-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(244, 185, 66, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(244, 185, 66, 0.35);
+  letter-spacing: 0.4px;
+}
+
+.today-moon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.today-sabbath-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--sabbath-bg);
+  color: var(--sabbath-color);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  font-family: var(--font-myanmar);
+  display: none;
+}
+.today-sabbath-badge.visible {
+  display: inline-flex;
+  align-items: center;
+}
+
+.thingyan-timing {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-family: var(--font-myanmar);
+}
+
+/* ── Legend Dot Extensions ───────────────────────────────────── */
+.legend-dot.nagapor { background: var(--nagapor-color); }
+.legend-dot.sabbath { background: var(--sabbath-color); }
+.legend-dot.yatpote { background: var(--yatpote-color); }
+
+.ausp-guide-item.nagapor-bg {
+  background: var(--nagapor-bg);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+.ausp-guide-item.nagapor-bg .ausp-icon { color: var(--nagapor-color); }
+
+.ausp-guide-item.sabbath-bg {
+  background: var(--sabbath-bg);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+.ausp-guide-item.sabbath-bg .ausp-icon { color: var(--sabbath-color); }
+
+/* ── Calendar Cell Badges & Indicators (Additional Helpers) ──────────────── */
+.calendar-day.nagapor:not(.today) {
+  border-color: rgba(236, 72, 153, 0.35);
+}
+.calendar-day.sabbath:not(.today) {
+  box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.4);
+}
+
+/* ── Action Buttons ──────────────────────────────────────────── */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bg-glass-border);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.action-btn-outline:hover {
+  background: rgba(244, 185, 66, 0.15);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.footer-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bg-glass-border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.footer-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* ── Auspicious Date Finder View ─────────────────────────────── */
+.finder-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1100px;
+}
+
+.finder-card {
+  padding: 24px;
+}
+
+.finder-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.finder-subtext {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.finder-purposes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.purpose-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--bg-glass-border);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+.purpose-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(244, 185, 66, 0.4);
+  transform: translateY(-2px);
+}
+.purpose-card.active {
+  background: rgba(244, 185, 66, 0.12);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.purpose-icon { font-size: 24px; margin-bottom: 8px; }
+.purpose-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.purpose-name-mm { font-size: 11px; font-family: var(--font-myanmar); color: var(--accent-primary); margin-top: 2px; }
+.purpose-desc { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin-top: 6px; }
+
+.finder-controls-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bg-glass-border);
+  flex-wrap: wrap;
+}
+
+.finder-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.finder-control-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.finder-date-inputs {
+  display: flex;
+  gap: 10px;
+}
+.finder-date-inputs select {
+  min-width: 140px;
+}
+
+.finder-search-btn {
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Results section */
+.finder-results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.results-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.results-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.finder-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.finder-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
+  background: var(--bg-card);
+  border: 1px solid var(--bg-glass-border);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-fast);
+}
+.finder-result-item:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(244, 185, 66, 0.3);
+  transform: translateX(4px);
+}
+
+.result-date-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-gregorian-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.result-myanmar-text {
+  font-size: 13px;
+  color: var(--accent-primary);
+  font-family: var(--font-myanmar);
+}
+.result-english-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.result-reasons-col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 50%;
+}
+.reason-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: var(--yatyaza-bg);
+  color: var(--yatyaza-color);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+.caution-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: var(--pyathada-bg);
+  color: var(--pyathada-color);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.result-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.score-badge {
+  font-size: 14px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(244, 185, 66, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(244, 185, 66, 0.4);
+}
+.score-label { font-size: 10px; color: var(--text-muted); }
+
+/* ── 8-Mansion Astrology Styles ──────────────────────────────── */
+.astro-card-header {
+  margin-bottom: 20px;
+}
+
+.astro-calc-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--bg-glass-border);
+  flex-wrap: wrap;
+}
+
+.astro-input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.astro-input-block label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.time-toggle-group {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bg-glass-border);
+}
+.time-toggle-btn {
+  padding: 8px 14px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.time-toggle-btn:hover { background: rgba(255, 255, 255, 0.08); }
+.time-toggle-btn.active {
+  background: var(--accent-primary);
+  color: #0d0f14;
+  font-weight: 700;
+}
+
+.astro-btn {
+  padding: 10px 24px;
+}
+
+.mahabote-chart-container {
+  margin-top: 24px;
+}
+
+.mahabote-header-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.summary-pill {
+  padding: 14px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--bg-glass-border);
+}
+.summary-pill-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.summary-pill-val { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.summary-pill-val.mm { font-family: var(--font-myanmar); color: var(--accent-primary); }
+
+.mansions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.mansion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 12px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--bg-glass-border);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+.mansion-card.birth-house {
+  background: rgba(244, 185, 66, 0.12);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.birth-house-badge {
+  position: absolute;
+  top: -8px;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--accent-primary);
+  color: #0d0f14;
+  text-transform: uppercase;
+}
+
+.mansion-house-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.mansion-house-mm { font-size: 15px; font-family: var(--font-myanmar); color: var(--accent-primary); margin: 2px 0 6px 0; }
+.mansion-theme { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
+.mansion-ruler { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── 3-Nakhat Beings ─────────────────────────────────────────── */
+.nakhat-beings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+.being-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--bg-glass-border);
+}
+.being-icon { font-size: 24px; }
+.being-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.being-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
+
+/* ── Thingyan Detail Content ─────────────────────────────────── */
+.thingyan-detail-content {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.timing-highlight {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(244, 185, 66, 0.08);
+  border: 1px solid rgba(244, 185, 66, 0.25);
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* ── Toast Notifications ─────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  padding: 12px 18px;
+  border-radius: var(--border-radius);
+  background: #1a1e2a;
+  border: 1px solid var(--accent-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

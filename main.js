@@ -1,8 +1,9 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, screen, dialog, Notification } = require('electron');
 const path = require('path');
-const { getMyanmarDate, getMonthData, getYearData, getThingyanCountdown, getMyanmarHolidays } = require('./src/myanmar-calendar-engine');
+const fs = require('fs');
+const engine = require('./src/myanmar-calendar-engine');
 
 let mainWindow;
 let tray;
@@ -11,26 +12,21 @@ let isQuitting = false;
 // ─── App Configuration ────────────────────────────────────────────────────────
 app.setName('Myanmar Calendar');
 
-// Hide from dock when minimized (menu bar behavior option)
-if (process.platform === 'darwin') {
-  app.dock.setIcon(path.join(__dirname, 'assets', 'dock-icon.png'));
-}
-
 // ─── Window Creation ──────────────────────────────────────────────────────────
 function createWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 820,
-    minWidth: 900,
-    minHeight: 650,
-    title: 'Myanmar Calendar',
+    width: 1240,
+    height: 840,
+    minWidth: 920,
+    minHeight: 660,
+    title: 'Myanmar Calendar — မြန်မာပြက္ခဒိန်',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 16, y: 16 },
     vibrancy: 'sidebar',
     visualEffectState: 'active',
-    backgroundColor: '#00000000',
+    backgroundColor: '#0d0f14',
     transparent: false,
     frame: true,
     icon: path.join(__dirname, 'assets', 'icon.png'),
@@ -45,7 +41,6 @@ function createWindow() {
 
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
-  // Dev tools in development
   if (process.argv.includes('--dev')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
@@ -64,13 +59,12 @@ function createWindow() {
 
 // ─── System Tray ─────────────────────────────────────────────────────────────
 function createTray() {
-  const iconPath = path.join(__dirname, 'assets', 'tray-icon.png');
+  const iconPath = path.join(__dirname, 'assets', 'icon.png');
   let trayIcon;
 
   try {
     trayIcon = nativeImage.createFromPath(iconPath);
     if (trayIcon.isEmpty()) {
-      // Create a simple calendar icon programmatically
       trayIcon = nativeImage.createFromDataURL(getDefaultTrayIcon());
     }
   } catch {
@@ -82,12 +76,36 @@ function createTray() {
   updateTrayTitle();
   setInterval(updateTrayTitle, 60000); // Update every minute
 
+  const today = new Date();
+  const mmd = engine.getMyanmarDate(today);
+
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Open Myanmar Calendar', click: showWindow },
     { type: 'separator' },
     {
-      label: 'Today\'s Date', enabled: false,
-      click: () => {}
+      label: `${mmd.formatted.myanmarDate}`,
+      enabled: false,
+    },
+    {
+      label: `${mmd.myanmar.year} ME (${mmd.myanmar.sasanaYear} BE)`,
+      enabled: false,
+    },
+    { type: 'separator' },
+    {
+      label: 'Check Auspicious Days...',
+      click: () => {
+        showWindow();
+        if (mainWindow) {
+          mainWindow.webContents.send('navigate-to', 'finder');
+        }
+      }
+    },
+    {
+      label: 'Export Holidays (.ics)...',
+      click: async () => {
+        const year = new Date().getFullYear();
+        await exportIcalFile(year);
+      }
     },
     { type: 'separator' },
     {
@@ -100,7 +118,7 @@ function createTray() {
   ]);
 
   tray.setContextMenu(contextMenu);
-  tray.setToolTip('Myanmar Calendar');
+  tray.setToolTip(`Myanmar Calendar — ${mmd.formatted.myanmarDate}`);
 
   tray.on('click', () => {
     if (mainWindow) {
@@ -115,11 +133,11 @@ function createTray() {
 
 function updateTrayTitle() {
   const today = new Date();
-  const mmd = getMyanmarDate(today);
-  const title = `${mmd.myanmar.year}`;
+  const mmd = engine.getMyanmarDate(today);
+  const title = ` ${mmd.myanmar.year} ME`;
   if (tray) {
     tray.setTitle(title);
-    tray.setToolTip(`Myanmar Calendar — ${mmd.formatted.myanmarDate}`);
+    tray.setToolTip(`Myanmar Calendar — ${mmd.formatted.myanmarDate} (${mmd.myanmar.sasanaYear} BE)`);
   }
 }
 
@@ -129,22 +147,41 @@ function showWindow() {
   } else {
     mainWindow.show();
     mainWindow.focus();
-    if (process.platform === 'darwin') {
+    if (process.platform === 'darwin' && app.dock) {
       app.dock.show();
     }
   }
 }
 
 function getDefaultTrayIcon() {
-  // Simple SVG-based icon as base64 PNG fallback
   return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAYAAAAmlE46AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADRSURBVCiRY2AYdICRgYGBgQEDA8P/f//+MzAyMDAwMDEw/P/////MzMzM////n4GBgYGBiYHhPwMDAwMDEwPDfwYGBgYGJgaG/wwMDAwMTAwM/xkYGBgYmBgY/jMwMDAwMDEw/GdgYGBgYGJg+M/AwMDAwMTAwH8GBgYGBiYGhv8MDAwMDExMDP8ZGBgYGJgYGP4zMDAwMDAxMPxnYGBgYGBiYPjPwMDAwMDEwPCfgYGBgYGJgeE/AwMDAwMTE8N/BgYGBgYmBob/DAwMDAxMTAz/GRgYGBiYGP4PABvGEhvHJM8AAAAASUVORK5CYII=';
 }
 
+async function exportIcalFile(year) {
+  const targetYear = year || new Date().getFullYear();
+  const defaultPath = `myanmar_calendar_holidays_${targetYear}.ics`;
+
+  const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+    title: 'Export Myanmar Holidays to iCalendar (.ics)',
+    defaultPath,
+    filters: [
+      { name: 'iCalendar File (*.ics)', extensions: ['ics'] }
+    ]
+  });
+
+  if (canceled || !filePath) return { success: false, canceled: true };
+
+  const icsData = engine.generateIcsCalendar(targetYear);
+  fs.writeFileSync(filePath, icsData, 'utf-8');
+
+  return { success: true, filePath };
+}
+
 // ─── IPC Handlers ─────────────────────────────────────────────────────────────
+
 ipcMain.handle('get-myanmar-date', (event, dateStr) => {
   try {
-    const date = dateStr ? new Date(dateStr) : new Date();
-    return getMyanmarDate(date);
+    return engine.getMyanmarDate(dateStr || undefined);
   } catch (err) {
     return { error: err.message };
   }
@@ -152,7 +189,7 @@ ipcMain.handle('get-myanmar-date', (event, dateStr) => {
 
 ipcMain.handle('get-month-data', (event, year, month) => {
   try {
-    return getMonthData(year, month);
+    return engine.getMonthData(year, month);
   } catch (err) {
     return { error: err.message };
   }
@@ -160,7 +197,7 @@ ipcMain.handle('get-month-data', (event, year, month) => {
 
 ipcMain.handle('get-year-data', (event, year) => {
   try {
-    return getYearData(year);
+    return engine.getYearData(year);
   } catch (err) {
     return { error: err.message };
   }
@@ -168,7 +205,7 @@ ipcMain.handle('get-year-data', (event, year) => {
 
 ipcMain.handle('get-thingyan-countdown', () => {
   try {
-    return getThingyanCountdown();
+    return engine.getThingyanCountdown();
   } catch (err) {
     return { error: err.message };
   }
@@ -176,7 +213,7 @@ ipcMain.handle('get-thingyan-countdown', () => {
 
 ipcMain.handle('get-holidays', (event, year, month) => {
   try {
-    return getMyanmarHolidays(year, month);
+    return engine.getMyanmarHolidays(year, month);
   } catch (err) {
     return { error: err.message };
   }
@@ -192,10 +229,82 @@ ipcMain.handle('get-today', () => {
   };
 });
 
+// Phase 2 IPC handlers
+ipcMain.handle('find-auspicious-dates', (event, purpose, year, month, count) => {
+  try {
+    return engine.findAuspiciousDates(purpose, year, month, count || 10);
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('export-ical', async (event, year) => {
+  try {
+    return await exportIcalFile(year);
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('get-8mansion-chart', (event, my, weekday, isWednesdayPM) => {
+  try {
+    return engine.get8MansionChart(my, weekday, isWednesdayPM);
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('convert-myanmar-to-gregorian', (event, my, mm, md) => {
+  try {
+    const jdn = engine.m2j(my, mm, md);
+    const greg = engine.jdnToGregorian(jdn);
+    const fullDate = engine.getMyanmarDate(new Date(greg.year, greg.month - 1, greg.day));
+    return {
+      gregorian: greg,
+      myanmarDate: fullDate,
+      jdn
+    };
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+ipcMain.handle('send-notification', (event, options) => {
+  try {
+    if (Notification.isSupported()) {
+      new Notification({
+        title: options.title || 'Myanmar Calendar',
+        body: options.body || '',
+        icon: path.join(__dirname, 'assets', 'icon.png'),
+        silent: options.silent || false
+      }).show();
+      return { success: true };
+    }
+    return { success: false, reason: 'Notifications not supported' };
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
 // ─── App Lifecycle ────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
   createWindow();
   createTray();
+
+  // Check today's special day on launch (Sabbath or Full Moon notification)
+  const today = new Date();
+  const mmd = engine.getMyanmarDate(today);
+  if (mmd.auspicious.sabbath === 1 || mmd.myanmar.moonPhase === 1) {
+    setTimeout(() => {
+      if (Notification.isSupported()) {
+        const title = mmd.myanmar.moonPhase === 1
+          ? `🌕 ${mmd.formatted.myanmarDateMM} (Full Moon Day)`
+          : `✨ Today is ${mmd.auspicious.sabbathStrMM} (Uposatha Sabbath)`;
+        const body = `${mmd.formatted.fullDateMM} — Auspicious merit-making day.`;
+        new Notification({ title, body, icon: path.join(__dirname, 'assets', 'icon.png') }).show();
+      }
+    }, 2000);
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

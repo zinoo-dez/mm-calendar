@@ -9,7 +9,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Myanmar:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -35,10 +35,16 @@
 
       <!-- Today Card -->
       <div class="today-card" id="today-card">
-        <div class="today-gregorian" id="today-gregorian">Loading...</div>
+        <div class="today-header-row">
+          <div class="today-gregorian" id="today-gregorian">Loading...</div>
+          <div class="sasana-badge" id="today-sasana-badge" title="Buddhist Era / Sasana Year">2570 BE</div>
+        </div>
         <div class="today-myanmar-year" id="today-myanmar-year"></div>
         <div class="today-myanmar-date" id="today-myanmar-date"></div>
-        <div class="today-moon" id="today-moon"></div>
+        <div class="today-moon-row">
+          <div class="today-moon" id="today-moon"></div>
+          <div class="today-sabbath-badge" id="today-sabbath-badge"></div>
+        </div>
         <div class="today-weekday" id="today-weekday"></div>
       </div>
 
@@ -53,6 +59,7 @@
         <div class="thingyan-label">💧 Thingyan Countdown</div>
         <div class="thingyan-countdown" id="thingyan-countdown">—</div>
         <div class="thingyan-date" id="thingyan-date"></div>
+        <div class="thingyan-timing" id="thingyan-timing"></div>
       </div>
 
       <!-- Navigation -->
@@ -65,6 +72,10 @@
           <span class="nav-icon">📆</span>
           <span>Year Overview</span>
         </button>
+        <button class="nav-btn" id="nav-finder" data-view="finder">
+          <span class="nav-icon">✨</span>
+          <span>Auspicious Finder</span>
+        </button>
         <button class="nav-btn" id="nav-converter" data-view="converter">
           <span class="nav-icon">🔄</span>
           <span>Date Converter</span>
@@ -75,45 +86,55 @@
         </button>
         <button class="nav-btn" id="nav-astro" data-view="astro">
           <span class="nav-icon">🔮</span>
-          <span>Astrology</span>
+          <span>Astrology & Mahabote</span>
         </button>
       </nav>
 
-      <!-- Theme Toggle -->
+      <!-- Sidebar Footer -->
       <div class="sidebar-footer">
+        <button class="footer-action-btn" id="notify-test-btn" title="Send today's auspicious notification">
+          <span>🔔 Notify</span>
+        </button>
         <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
           <span id="theme-icon">☀️</span>
           <span id="theme-label">Light Mode</span>
         </button>
-        <div class="app-version">v1.0.0</div>
+        <div class="app-version">v2.0 Pro</div>
       </div>
     </aside>
 
     <!-- ── Main Content ──────────────────────────────────────── -->
     <main class="main-content" id="main-content">
 
-      <!-- ── MONTH VIEW ──────────────────────────────────────── -->
+      <!-- ── 1. MONTH VIEW ────────────────────────────────────── -->
       <section class="view active" id="view-month">
         <div class="view-header">
           <div class="month-nav">
             <button class="nav-arrow" id="prev-month" title="Previous month">‹</button>
             <div class="month-title-group">
               <h1 class="month-title" id="month-title">October 2026</h1>
-              <div class="month-subtitle" id="month-subtitle-mm">တော်သလင်း ၁၃၈၈</div>
+              <div class="month-subtitle" id="month-subtitle-mm">သီတင်းကျွတ် ၁၃၈၈ (သာသနာနှစ် ၂၅၇၀)</div>
             </div>
             <button class="nav-arrow" id="next-month" title="Next month">›</button>
           </div>
-          <button class="today-btn" id="goto-today">Today</button>
+          <div class="header-actions">
+            <button class="action-btn-outline" id="export-month-ics" title="Export this year's holidays to Apple Calendar">
+              <span class="btn-icon">📅</span> Export .ics
+            </button>
+            <button class="today-btn" id="goto-today">Today</button>
+          </div>
         </div>
 
         <!-- Month Legend -->
         <div class="month-legend">
-          <span class="legend-item"><span class="legend-dot yatyaza"></span>Yatyaza</span>
-          <span class="legend-item"><span class="legend-dot pyathada"></span>Pyathada</span>
-          <span class="legend-item"><span class="legend-dot amyeittasote"></span>Amyeittasote</span>
+          <span class="legend-item"><span class="legend-dot yatyaza"></span>Yatyaza (ရက်ရာဇာ)</span>
+          <span class="legend-item"><span class="legend-dot pyathada"></span>Pyathada (ပြဿဒါး)</span>
+          <span class="legend-item"><span class="legend-dot amyeittasote"></span>Amyeittasote (အမြိုက်စိုတ်)</span>
+          <span class="legend-item"><span class="legend-dot nagapor"></span>Nagapor (နဂါးပေါ်)</span>
+          <span class="legend-item"><span class="legend-dot sabbath"></span>Sabbath (ဥပုသ်)</span>
           <span class="legend-item"><span class="legend-dot holiday"></span>Holiday</span>
-          <span class="legend-item"><span class="legend-dot full-moon"></span>Full Moon</span>
-          <span class="legend-item"><span class="legend-dot new-moon"></span>New Moon</span>
+          <span class="legend-item"><span class="legend-dot full-moon"></span>Full Moon (လပြည့်)</span>
+          <span class="legend-item"><span class="legend-dot new-moon"></span>New Moon (လကွယ်)</span>
         </div>
 
         <!-- Calendar Grid -->
@@ -138,14 +159,14 @@
         </div>
       </section>
 
-      <!-- ── YEAR VIEW ───────────────────────────────────────── -->
+      <!-- ── 2. YEAR VIEW ─────────────────────────────────────── -->
       <section class="view" id="view-year">
         <div class="view-header">
           <div class="month-nav">
             <button class="nav-arrow" id="prev-year">‹</button>
             <div class="month-title-group">
               <h1 class="month-title" id="year-title">2026</h1>
-              <div class="month-subtitle" id="year-subtitle-mm">မြန်မာသက္ကရာဇ် ၁၃၈၈</div>
+              <div class="month-subtitle" id="year-subtitle-mm">မြန်မာသက္ကရာဇ် ၁၃၈၈ (သာသနာနှစ် ၂၅၇၀)</div>
             </div>
             <button class="nav-arrow" id="next-year">›</button>
           </div>
@@ -154,21 +175,117 @@
         <div class="year-grid" id="year-grid"></div>
       </section>
 
-      <!-- ── DATE CONVERTER ──────────────────────────────────── -->
+      <!-- ── 3. AUSPICIOUS DATE FINDER (NEW) ──────────────────── -->
+      <section class="view" id="view-finder">
+        <div class="view-header">
+          <div class="month-title-group">
+            <h1 class="month-title">Auspicious Date Finder</h1>
+            <div class="month-subtitle">မင်္ဂလာရက် ရွေးချယ်ရန် ကိရိယာ</div>
+          </div>
+        </div>
+
+        <div class="finder-container">
+          <!-- Event Category Selection -->
+          <div class="finder-card glass-card">
+            <h3>1. Select Event Purpose (မင်္ဂလာပြုမည့် ကိစ္စရပ်)</h3>
+            <p class="finder-subtext">Choose your event type to automatically match traditional auspicious rules (Yatyaza, Amyeittasote, Moon phase) and strictly filter out inauspicious taboos (Pyathada, Nagapor, Yatpote, Mahayatkyan).</p>
+            <div class="finder-purposes-grid" id="finder-purposes-grid">
+              <button class="purpose-card active" data-purpose="wedding">
+                <span class="purpose-icon">💍</span>
+                <span class="purpose-name">Wedding</span>
+                <span class="purpose-name-mm">မင်္ဂလာဆောင်</span>
+                <span class="purpose-desc">Waxing moon, Yatyaza/Amyeittasote, strictly avoid Pyathada, Nagapor & Sabbath</span>
+              </button>
+              <button class="purpose-card" data-purpose="housewarming">
+                <span class="purpose-icon">🏡</span>
+                <span class="purpose-name">Housewarming</span>
+                <span class="purpose-name-mm">အိမ်တက်/အိမ်ဆောက်</span>
+                <span class="purpose-desc">Prosperity days, favorable houses, avoid Nagapor dragon taboo</span>
+              </button>
+              <button class="purpose-card" data-purpose="business">
+                <span class="purpose-icon">💼</span>
+                <span class="purpose-name">Business Opening</span>
+                <span class="purpose-name-mm">ဆိုင်ဖွင့်/စီးပွားစတင်</span>
+                <span class="purpose-desc">Commercial fortune, Yatyaza, Warameittugyi, financial expansion</span>
+              </button>
+              <button class="purpose-card" data-purpose="travel">
+                <span class="purpose-icon">✈️</span>
+                <span class="purpose-name">Travel / Journey</span>
+                <span class="purpose-name-mm">ခရီးထွက်/ခရီးသွား</span>
+                <span class="purpose-desc">Safe passage, direction check against Nagahle dragon heading</span>
+              </button>
+              <button class="purpose-card" data-purpose="ordination">
+                <span class="purpose-icon">🧘</span>
+                <span class="purpose-name">Ordination (Shinpyu)</span>
+                <span class="purpose-name-mm">ရှင်ပြု/ရဟန်းခံ</span>
+                <span class="purpose-desc">Full moon days, Uposatha Sabbath, pure merit-making moments</span>
+              </button>
+              <button class="purpose-card" data-purpose="general">
+                <span class="purpose-icon">⭐</span>
+                <span class="purpose-name">General Auspicious</span>
+                <span class="purpose-name-mm">အထွေထွေ မင်္ဂလာ</span>
+                <span class="purpose-desc">All Yatyaza & Amyeittasote days free from Pyathada</span>
+              </button>
+            </div>
+
+            <!-- Search Controls -->
+            <div class="finder-controls-row">
+              <div class="finder-control-group">
+                <label>Starting From Month</label>
+                <div class="finder-date-inputs">
+                  <select id="finder-year-select" class="date-input"></select>
+                  <select id="finder-month-select" class="date-input">
+                    <option value="1">January (ဇန်နဝါရီ)</option>
+                    <option value="2">February (ဖေဖော်ဝါရီ)</option>
+                    <option value="3">March (မတ်)</option>
+                    <option value="4">April (ဧပြီ)</option>
+                    <option value="5">May (မေ)</option>
+                    <option value="6">June (ဇွန်)</option>
+                    <option value="7">July (ဇူလိုင်)</option>
+                    <option value="8">August (ဩဂုတ်)</option>
+                    <option value="9">September (စက်တင်ဘာ)</option>
+                    <option value="10">October (အောက်တိုဘာ)</option>
+                    <option value="11">November (နိုဝင်ဘာ)</option>
+                    <option value="12">December (ဒီဇင်ဘာ)</option>
+                  </select>
+                </div>
+              </div>
+              <button class="convert-btn finder-search-btn" id="finder-search-btn">
+                <span>🔍 Find Best Dates</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Results List -->
+          <div class="finder-results-section">
+            <div class="results-header">
+              <h3 id="finder-results-title">Recommended Auspicious Dates</h3>
+              <span class="results-badge" id="finder-results-count">0 dates found</span>
+            </div>
+            <div class="finder-results-list" id="finder-results-list">
+              <div class="result-placeholder">Click "Find Best Dates" to view curated auspicious dates</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 4. DATE CONVERTER ───────────────────────────────── -->
       <section class="view" id="view-converter">
         <div class="view-header">
           <div class="month-title-group">
-            <h1 class="month-title">Date Converter</h1>
-            <div class="month-subtitle" id="">ရက်ခုံပြောင်းလဲသည့်ကိရိယာ</div>
+            <h1 class="month-title">Bidirectional Date Converter</h1>
+            <div class="month-subtitle">တိကျသေချာသော ရက်စွဲပြောင်းလဲခြင်း ကိရိယာ</div>
           </div>
         </div>
         <div class="converter-container">
+          <!-- Gregorian to Myanmar -->
           <div class="converter-card glass-card">
             <h3>Gregorian → Myanmar</h3>
+            <p class="converter-sub">Enter any Gregorian calendar date to get the exact Myanmar lunisolar date, astrological signs, and Sasana Year.</p>
             <div class="converter-input-group">
               <label>Select Gregorian Date</label>
               <input type="date" id="gregorian-input" class="date-input" />
-              <button class="convert-btn" id="convert-to-myanmar">Convert →</button>
+              <button class="convert-btn" id="convert-to-myanmar">Convert to Myanmar →</button>
             </div>
             <div class="converter-result" id="myanmar-result">
               <div class="result-placeholder">Select a date to convert</div>
@@ -181,38 +298,46 @@
             <div class="divider-line"></div>
           </div>
 
+          <!-- Myanmar to Gregorian (Exact Bidirectional) -->
           <div class="converter-card glass-card">
-            <h3>Myanmar → Gregorian</h3>
+            <h3>Myanmar → Gregorian (Exact)</h3>
+            <p class="converter-sub">Powered by the canonical Cool-Emerald reverse Julian formula (`m2j`). Computes the precise Gregorian date.</p>
             <div class="converter-input-group">
-              <label>Myanmar Year (ME)</label>
-              <input type="number" id="myanmar-year-input" class="date-input" placeholder="e.g. 1388" min="1" max="2000" />
-              <label>Myanmar Month</label>
-              <select id="myanmar-month-input" class="date-input">
-                <option value="1">Tagu (တန်ခူး)</option>
-                <option value="2">Kason (ကဆုန်)</option>
-                <option value="3">Nayon (နယုန်)</option>
-                <option value="0">2nd Waso (ဒုတိယဝါဆို)</option>
-                <option value="4">Waso (ဝါဆို)</option>
-                <option value="5">Wagaung (ဝါခေါင်)</option>
-                <option value="6">Tawthalin (တော်သလင်း)</option>
-                <option value="7">Thadingyut (သီတင်းကျွတ်)</option>
-                <option value="8">Tazaungmon (တန်ဆောင်မုန်း)</option>
-                <option value="9">Nadaw (နတ်တော်)</option>
-                <option value="10">Pyatho (ပြာသို)</option>
-                <option value="11">Tabodwe (တပို့တွဲ)</option>
-                <option value="12">Tabaung (တပေါင်း)</option>
-              </select>
-              <label>Moon Phase & Day</label>
+              <div class="converter-row">
+                <div class="col">
+                  <label>Myanmar Year (ME)</label>
+                  <input type="number" id="myanmar-year-input" class="date-input" placeholder="e.g. 1388" min="1" max="2500" value="1388" />
+                </div>
+                <div class="col">
+                  <label>Myanmar Month</label>
+                  <select id="myanmar-month-input" class="date-input">
+                    <option value="1">Tagu (တန်ခူး)</option>
+                    <option value="2">Kason (ကဆုန်)</option>
+                    <option value="3">Nayon (နယုန်)</option>
+                    <option value="0">1st Waso (ပထမဝါဆို)</option>
+                    <option value="4" selected>2nd Waso / Waso (ဒုတိယဝါဆို/ဝါဆို)</option>
+                    <option value="5">Wagaung (ဝါခေါင်)</option>
+                    <option value="6">Tawthalin (တော်သလင်း)</option>
+                    <option value="7">Thadingyut (သီတင်းကျွတ်)</option>
+                    <option value="8">Tazaungmon (တန်ဆောင်မုန်း)</option>
+                    <option value="9">Nadaw (နတ်တော်)</option>
+                    <option value="10">Pyatho (ပြာသို)</option>
+                    <option value="11">Tabodwe (တပို့တွဲ)</option>
+                    <option value="12">Tabaung (တပေါင်း)</option>
+                  </select>
+                </div>
+              </div>
+              <label>Fortnight Moon Day (၁ မှ ၃၀ ထိ)</label>
               <div class="moon-input-row">
                 <select id="moon-phase-input" class="date-input">
                   <option value="0">Waxing (လဆန်း)</option>
-                  <option value="1">Full Moon (လပြည့်)</option>
+                  <option value="1">Full Moon (လပြည့် — Day 15)</option>
                   <option value="2">Waning (လဆုတ်)</option>
-                  <option value="3">New Moon (လကွယ်)</option>
+                  <option value="3">New Moon (လကွယ် — Day 30)</option>
                 </select>
-                <input type="number" id="moon-day-input" class="date-input" placeholder="Day (1-15)" min="1" max="15" />
+                <input type="number" id="moon-day-input" class="date-input" placeholder="Day (1-15)" min="1" max="15" value="1" />
               </div>
-              <button class="convert-btn" id="convert-to-gregorian">Convert →</button>
+              <button class="convert-btn" id="convert-to-gregorian">Convert to Gregorian →</button>
             </div>
             <div class="converter-result" id="gregorian-result">
               <div class="result-placeholder">Enter Myanmar date to convert</div>
@@ -221,106 +346,144 @@
         </div>
       </section>
 
-      <!-- ── FESTIVALS VIEW ──────────────────────────────────── -->
+      <!-- ── 5. FESTIVALS VIEW ───────────────────────────────── -->
       <section class="view" id="view-festivals">
         <div class="view-header">
           <div class="month-title-group">
             <h1 class="month-title">Myanmar Festivals & Holidays</h1>
-            <div class="month-subtitle" id="">ပွဲတော်များနှင့် အမျိုးသားရေးရာနေ့များ</div>
+            <div class="month-subtitle">ပွဲတော်များနှင့် အမျိုးသားရေးရာ အားလပ်ရက်များ</div>
           </div>
-          <select class="year-select" id="festivals-year-select">
-            <!-- Populated by JS -->
-          </select>
+          <div class="header-actions">
+            <button class="action-btn-outline" id="export-festivals-ics">
+              <span class="btn-icon">📅</span> Export Apple Calendar (.ics)
+            </button>
+            <select class="year-select" id="festivals-year-select"></select>
+          </div>
         </div>
         <div class="festivals-container" id="festivals-container"></div>
       </section>
 
-      <!-- ── ASTROLOGY VIEW ──────────────────────────────────── -->
+      <!-- ── 6. ASTROLOGY & MAHABOTE VIEW ────────────────────── -->
       <section class="view" id="view-astro">
         <div class="view-header">
           <div class="month-title-group">
-            <h1 class="month-title">Myanmar Astrology</h1>
-            <div class="month-subtitle">မြန်မာ့ဗေဒင်</div>
+            <h1 class="month-title">Myanmar Astrology & 8-Mansion Chart</h1>
+            <div class="month-subtitle">မြန်မာ့ဗေဒင်နှင့် မဟာဘုတ် ၈ ပိုင်း ဇာတာတော်</div>
           </div>
         </div>
         <div class="astro-container">
-          <!-- Mahabote Section -->
-          <div class="astro-card glass-card">
-            <h3>🔮 Mahabote — မဟာဘုတ်</h3>
-            <p class="astro-desc">Select a birth date to calculate Mahabote (planetary energy)</p>
-            <div class="astro-input-group">
-              <label>Birth Date</label>
-              <input type="date" id="birth-date-input" class="date-input" />
-              <button class="convert-btn" id="calc-mahabote">Calculate</button>
+          <!-- Mahabote & 8-Mansion Section -->
+          <div class="astro-card glass-card full-width">
+            <div class="astro-card-header">
+              <div>
+                <h3>🔮 Mahabote 8-Mansion Life Chart (မဟာဘုတ် ၈ ပိုင်း)</h3>
+                <p class="astro-desc">Traditional Burmese astrology system mapping your birth planetary energy into the 7 houses with the 8-day Myanmar week (including Rahu for Wednesday afternoon births).</p>
+              </div>
             </div>
-            <div class="mahabote-result" id="mahabote-result"></div>
+
+            <div class="astro-calc-row">
+              <div class="astro-input-block">
+                <label>Select Birth Date</label>
+                <input type="date" id="birth-date-input" class="date-input" />
+              </div>
+              <div class="astro-input-block">
+                <label>Wednesday Birth Time</label>
+                <div class="time-toggle-group">
+                  <button type="button" class="time-toggle-btn active" id="wed-am-btn">Wed AM (Mercury/အဓိပတိ)</button>
+                  <button type="button" class="time-toggle-btn" id="wed-pm-btn">Wed PM (Rahu/ရာဟု)</button>
+                </div>
+              </div>
+              <button class="convert-btn astro-btn" id="calc-mahabote">Generate Chart</button>
+            </div>
+
+            <!-- Mahabote Chart Results -->
+            <div class="mahabote-chart-container" id="mahabote-chart-container">
+              <div class="result-placeholder">Select a birth date above to calculate your 8-Mansion Life Chart</div>
+            </div>
           </div>
 
-          <!-- Nakhat Section -->
-          <div class="astro-card glass-card">
-            <h3>🐉 Nakhat — နက္ခတ်</h3>
-            <p class="astro-desc">Myanmar zodiac animal year cycle (12-year cycle)</p>
+          <!-- Nakhat 12 Zodiac Animals Section -->
+          <div class="astro-card glass-card full-width">
+            <h3>🐉 Nakhat 12-Animal Zodiac Cycle (နဂါးစက်ဝိုင်း ၁၂ ကောင်)</h3>
+            <p class="astro-desc">The authentic Myanmar 12-animal year cycle (Bamaze) with elemental affiliations and current year ruler.</p>
             <div class="nakhat-grid" id="nakhat-grid"></div>
           </div>
 
-          <!-- Moon Phase Guide -->
-          <div class="astro-card glass-card full-width">
-            <h3>🌙 Moon Phase Guide — လဆင်းဆန်းဇယား</h3>
-            <div class="moon-guide-grid" id="moon-guide-grid">
-              <div class="moon-guide-item">
-                <div class="moon-symbol waxing">🌙</div>
-                <div class="moon-name">Waxing Moon</div>
-                <div class="moon-name-mm">လဆန်း</div>
-                <div class="moon-desc">Days 1–14. Good for starting new ventures, growth, and positive activities.</div>
+          <!-- 3-Nakhat Beings Guide -->
+          <div class="astro-card glass-card">
+            <h3>✨ 3-Nakhat Cosmic Beings (နက္ခတ် ၃ မျိုး)</h3>
+            <div class="nakhat-beings-list">
+              <div class="being-item">
+                <div class="being-icon">👹</div>
+                <div class="being-info">
+                  <div class="being-title">Ogre / Bilu (ဘီလူးနက္ခတ်)</div>
+                  <div class="being-desc">Courageous, fiercely determined, natural leaders, overcomes severe adversity through relentless drive.</div>
+                </div>
               </div>
-              <div class="moon-guide-item">
-                <div class="moon-symbol full">🌕</div>
-                <div class="moon-name">Full Moon</div>
-                <div class="moon-name-mm">လပြည့်</div>
-                <div class="moon-desc">Day 15. Sacred day. Ideal for offering to monks, paying respect to elders, meditation.</div>
+              <div class="being-item">
+                <div class="being-icon">🪽</div>
+                <div class="being-info">
+                  <div class="being-title">Deva / Nath (နတ်နက္ခတ်)</div>
+                  <div class="being-desc">Noble demeanor, naturally fortunate, artistic elegance, beloved by patrons, highly spiritual.</div>
+                </div>
               </div>
-              <div class="moon-guide-item">
-                <div class="moon-symbol waning">🌗</div>
-                <div class="moon-name">Waning Moon</div>
-                <div class="moon-name-mm">လဆုတ်</div>
-                <div class="moon-desc">Days 1–14 (waning). Good for completing projects, reflection, and reducing activities.</div>
+              <div class="being-item">
+                <div class="being-icon">👤</div>
+                <div class="being-info">
+                  <div class="being-title">Human / Lu (လူနက္ခတ်)</div>
+                  <div class="being-desc">Pragmatic, industrious, diplomatic, skilled in commerce and social navigation, steadfast.</div>
+                </div>
               </div>
-              <div class="moon-guide-item">
-                <div class="moon-symbol new">🌑</div>
-                <div class="moon-name">New Moon</div>
-                <div class="moon-name-mm">လကွယ်</div>
-                <div class="moon-desc">Day 15 (waning). Rest day. Avoid important decisions. Spiritual practices recommended.</div>
-              </div>
+            </div>
+          </div>
+
+          <!-- Thingyan Legend & Timing Card -->
+          <div class="astro-card glass-card">
+            <h3>💧 Thingyan Astronomical Timing (သင်္ကြန်ကျချိန်)</h3>
+            <div class="thingyan-detail-content" id="thingyan-detail-content">
+              Loading Thingyan astronomical details...
             </div>
           </div>
 
           <!-- Auspicious Days Guide -->
           <div class="astro-card glass-card full-width">
-            <h3>✨ Auspicious Days Guide — မင်္ဂလာနေ့ဆိုင်ရာ</h3>
+            <h3>✨ Auspicious & Inauspicious Days Reference (မင်္ဂလာနှင့် ရှောင်ရန်နေ့များ)</h3>
             <div class="ausp-guide-grid">
               <div class="ausp-guide-item yatyaza-bg">
                 <div class="ausp-icon">⭐</div>
                 <div class="ausp-name">Yatyaza</div>
                 <div class="ausp-name-mm">ရက်ရာဇာ</div>
-                <div class="ausp-desc">Royal/auspicious days. Excellent for weddings, business ventures, and important decisions. Brings prosperity and success.</div>
+                <div class="ausp-desc">King/Royal Day. Best for weddings, business starts, ceremonies, and housewarming.</div>
               </div>
               <div class="ausp-guide-item pyathada-bg">
                 <div class="ausp-icon">⚠️</div>
                 <div class="ausp-name">Pyathada</div>
                 <div class="ausp-name-mm">ပြဿဒါး</div>
-                <div class="ausp-desc">Fiery days. Traditionally avoided for major life events. May bring obstacles or intense challenges if not approached carefully.</div>
+                <div class="ausp-desc">Fiery obstacle day. Traditionally avoided for contracts, weddings, and investments.</div>
               </div>
               <div class="ausp-guide-item amyeittasote-bg">
                 <div class="ausp-icon">💎</div>
                 <div class="ausp-name">Amyeittasote</div>
                 <div class="ausp-name-mm">အမြိုက်စိုတ်</div>
-                <div class="ausp-desc">Nectar days. Exceptionally auspicious — brings longevity, good health, and the finest outcomes for all endeavors.</div>
+                <div class="ausp-desc">Nectar Day. Exceptionally auspicious for health, longevity, and peaceful prosperity.</div>
               </div>
               <div class="ausp-guide-item warameittugyi-bg">
                 <div class="ausp-icon">🌟</div>
                 <div class="ausp-name">Warameittugyi</div>
                 <div class="ausp-name-mm">ဝါရမိတ္တုကြီး</div>
-                <div class="ausp-desc">Great lucky days. Highly favorable for merit-making, offerings, and important ceremonies.</div>
+                <div class="ausp-desc">Great Friend Day. Highly favorable for merit-making, monk offerings, and rituals.</div>
+              </div>
+              <div class="ausp-guide-item nagapor-bg">
+                <div class="ausp-icon">🐉</div>
+                <div class="ausp-name">Nagapor</div>
+                <div class="ausp-name-mm">နဂါးပေါ်</div>
+                <div class="ausp-desc">Dragon Day. Avoid long journeys, planting crops, and laying building foundations.</div>
+              </div>
+              <div class="ausp-guide-item sabbath-bg">
+                <div class="ausp-icon">☸️</div>
+                <div class="ausp-name">Uposatha Sabbath</div>
+                <div class="ausp-name-mm">ဥပုသ်နေ့</div>
+                <div class="ausp-desc">Sacred moral observance day. Observing eight precepts, meditation, and charity.</div>
               </div>
             </div>
           </div>
@@ -337,6 +500,9 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toast-container"></div>
 
   <!-- Loading Overlay -->
   <div class="loading-overlay" id="loading-overlay">

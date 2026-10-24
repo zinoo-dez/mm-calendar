@@ -1,8 +1,8 @@
 'use strict';
 
 /* ═══════════════════════════════════════════════════════════════
-   Myanmar Calendar — Renderer Application Logic
-   Production-grade frontend with all features
+   Myanmar Calendar — Production Renderer Application Logic (v2.0)
+   Complete implementation of all domain knowledge features
    ═══════════════════════════════════════════════════════════════ */
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -17,6 +17,10 @@ const state = {
   todayInfo: null,
   thingyanInfo: null,
   festivalsYear: new Date().getFullYear(),
+  finderPurpose: 'wedding',
+  finderYear: new Date().getFullYear(),
+  finderMonth: new Date().getMonth() + 1,
+  isWednesdayPM: false,
   theme: localStorage.getItem('theme') || 'dark',
 };
 
@@ -24,81 +28,110 @@ const state = {
 const $ = id => document.getElementById(id);
 const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
-// ─── Weekday short names ───────────────────────────────────────────────────────
-const WEEKDAY_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+// ─── Constants ─────────────────────────────────────────────────────────────────
 const GREGORIAN_MONTHS = [
-  'January','February','March','April','May','June',
-  'July','August','September','October','November','December'
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-// ─── Myanmar Astrology Data ───────────────────────────────────────────────────
-const NAKHAT_ANIMALS = [
-  { emoji: '🐇', name: 'Tagu',    nameMM: 'တန်ခူး',      cycle: 1 },
-  { emoji: '🐉', name: 'Kason',   nameMM: 'ကဆုန်',       cycle: 2 },
-  { emoji: '🐍', name: 'Nayon',   nameMM: 'နယုန်',        cycle: 3 },
-  { emoji: '🐎', name: 'Waso',    nameMM: 'ဝါဆို',       cycle: 4 },
-  { emoji: '🐐', name: 'Wagaung', nameMM: 'ဝါခေါင်',     cycle: 5 },
-  { emoji: '🐒', name: 'Tawthalin',nameMM: 'တော်သလင်း', cycle: 6 },
-  { emoji: '🐓', name: 'Thadingyut',nameMM:'သီတင်းကျွတ်',cycle: 7 },
-  { emoji: '🐕', name: 'Tazaungmon',nameMM:'တန်ဆောင်မုန်း',cycle:8},
-  { emoji: '🐘', name: 'Nadaw',   nameMM: 'နတ်တော်',      cycle: 9 },
-  { emoji: '🐀', name: 'Pyatho',  nameMM: 'ပြာသို',      cycle: 10 },
-  { emoji: '🐂', name: 'Tabodwe', nameMM: 'တပို့တွဲ',    cycle: 11 },
-  { emoji: '🐯', name: 'Tabaung', nameMM: 'တပေါင်း',     cycle: 12 },
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// 12 Authentic Nakhat Animals (နဂါးစက်ဝိုင်း ၁၂ ကောင်)
+const NAKHAT_12 = [
+  { id: 0,  name: 'Garuda',   nameMM: 'ဂဠုန်',    my: 'Galon',    emoji: '🦅', element: 'Fire' },
+  { id: 1,  name: 'Kayar',    nameMM: 'ကြာ',      my: 'Kyar',     emoji: '🦢', element: 'Water' },
+  { id: 2,  name: 'Tiger',    nameMM: 'ကျား',     my: 'Kyar',     emoji: '🐯', element: 'Earth' },
+  { id: 3,  name: 'Rabbit',   nameMM: 'ယုန်',     my: 'Yon',      emoji: '🐇', element: 'Wood' },
+  { id: 4,  name: 'Naga',     nameMM: 'နဂါး',    my: 'Naga',     emoji: '🐉', element: 'Water' },
+  { id: 5,  name: 'Elephant', nameMM: 'ဆင်',      my: 'Sin',      emoji: '🐘', element: 'Earth' },
+  { id: 6,  name: 'Horse',    nameMM: 'မြင်း',    my: 'Myin',     emoji: '🐎', element: 'Fire' },
+  { id: 7,  name: 'Goat',     nameMM: 'သိုး',     my: 'Thoe',     emoji: '🐐', element: 'Earth' },
+  { id: 8,  name: 'Monkey',   nameMM: 'မျောက်',   my: 'Myauk',    emoji: '🐒', element: 'Metal' },
+  { id: 9,  name: 'Crow',     nameMM: 'ကျီးကန်း', my: 'Kyi-kan',  emoji: '🐦‍⬛', element: 'Air' },
+  { id: 10, name: 'Dog',      nameMM: 'ခွေး',     my: 'Khway',    emoji: '🐕', element: 'Earth' },
+  { id: 11, name: 'Pig',      nameMM: 'ဝက်',      my: 'Wet',      emoji: '🐖', element: 'Water' },
 ];
 
-const MAHABOTE_DATA = {
-  'Binga':    { planet: 'Sun ☀️',    lucky: 'Sunday',     desc: 'Leadership, authority, royalty. Bold decisions, high ambitions.', color: '#f59e0b' },
-  'Atun':     { planet: 'Moon 🌙',   lucky: 'Monday',     desc: 'Intuition, creativity, adaptability. Sensitive and empathetic.', color: '#93c5fd' },
-  'Yaza':     { planet: 'Mars ♂️',   lucky: 'Tuesday',    desc: 'Energy, courage, action. Warrior spirit, competitive nature.', color: '#f87171' },
-  'Adipati':  { planet: 'Mercury ☿', lucky: 'Wednesday',  desc: 'Intelligence, communication, trade. Clever and resourceful.', color: '#86efac' },
-  'Marana':   { planet: 'Jupiter ♃', lucky: 'Thursday',   desc: 'Wisdom, spirituality, expansion. Philosophical and generous.', color: '#d8b4fe' },
-  'Thike':    { planet: 'Venus ♀',   lucky: 'Friday',     desc: 'Love, beauty, harmony. Artistic and charming personality.', color: '#f9a8d4' },
-  'Puti':     { planet: 'Saturn ♄',  lucky: 'Saturday',   desc: 'Discipline, endurance, karma. Patient and hardworking.', color: '#94a3b8' },
-};
+// Myanmar numeral conversion
+const MYANMAR_NUMERALS = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
+function toMMNum(num) {
+  return String(num).split('').map(d => {
+    const n = parseInt(d, 10);
+    return isNaN(n) ? d : MYANMAR_NUMERALS[n];
+  }).join('');
+}
 
 // ─── App Initialization ───────────────────────────────────────────────────────
 async function init() {
-  // Apply theme
   document.documentElement.setAttribute('data-theme', state.theme);
   updateThemeUI();
 
-  // Load initial data
+  // Populate Year Selectors
+  populateYearSelectors();
+
+  // Load initial datasets
   await Promise.all([
     loadTodayInfo(),
     loadMonthView(state.currentYear, state.currentMonth),
     loadThingyan(),
   ]);
 
-  // Populate festivals year selector
-  const select = $('festivals-year-select');
-  const currentYear = new Date().getFullYear();
-  for (let y = currentYear - 2; y <= currentYear + 3; y++) {
-    const opt = document.createElement('option');
-    opt.value = y;
-    opt.textContent = `${y} (${y - 638} ME)`;
-    if (y === currentYear) opt.selected = true;
-    select.appendChild(opt);
-  }
-
-  // Initialize Nakhat grid
+  // Render Nakhat Zodiac Grid
   renderNakhatGrid();
 
-  // Hide loading
-  setTimeout(() => {
-    $('loading-overlay').classList.add('hidden');
-  }, 600);
-
+  // Setup Event Listeners
   setupEventListeners();
+
+  // Auto trigger initial Auspicious Finder search
+  searchAuspiciousDates();
+
+  // Hide loading overlay
+  setTimeout(() => {
+    const overlay = $('loading-overlay');
+    if (overlay) overlay.classList.add('hidden');
+  }, 400);
+}
+
+function populateYearSelectors() {
+  const currentYear = new Date().getFullYear();
+
+  // Festivals year selector
+  const festSelect = $('festivals-year-select');
+  if (festSelect) {
+    festSelect.innerHTML = '';
+    for (let y = currentYear - 3; y <= currentYear + 4; y++) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = `${y} (${y - 638} ME)`;
+      if (y === currentYear) opt.selected = true;
+      festSelect.appendChild(opt);
+    }
+  }
+
+  // Finder year selector
+  const finderSelect = $('finder-year-select');
+  if (finderSelect) {
+    finderSelect.innerHTML = '';
+    for (let y = currentYear; y <= currentYear + 3; y++) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = `${y} (${y - 638} ME)`;
+      if (y === currentYear) opt.selected = true;
+      finderSelect.appendChild(opt);
+    }
+  }
+
+  const finderMonthSelect = $('finder-month-select');
+  if (finderMonthSelect) {
+    finderMonthSelect.value = state.currentMonth;
+  }
 }
 
 // ─── Data Loading ─────────────────────────────────────────────────────────────
+
 async function loadTodayInfo() {
   try {
-    const today = new Date();
-    const dateStr = today.toISOString();
-    const info = await window.myanmarCalendar.getMyanmarDate(dateStr);
-
+    const info = await window.myanmarCalendar.getMyanmarDate();
     state.todayInfo = info;
     renderSidebarToday(info);
   } catch (err) {
@@ -132,7 +165,7 @@ async function loadThingyan() {
     state.thingyanInfo = info;
     renderThingyan(info);
   } catch (err) {
-    console.error('Failed to load thingyan:', err);
+    console.error('Failed to load thingyan info:', err);
   }
 }
 
@@ -152,6 +185,7 @@ async function loadFestivals(year) {
 }
 
 // ─── Sidebar Rendering ────────────────────────────────────────────────────────
+
 function renderSidebarToday(info) {
   if (!info || !info.gregorian) return;
 
@@ -160,346 +194,412 @@ function renderSidebarToday(info) {
   const aup = info.auspicious;
   const ast = info.astrology;
 
-  // Gregorian date
-  $('today-gregorian').textContent =
-    `${GREGORIAN_MONTHS[g.month - 1]} ${g.day}, ${g.year}`;
+  // Gregorian string
+  const gregDate = new Date(g.year, g.month - 1, g.day);
+  const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+  $('today-gregorian').textContent = gregDate.toLocaleDateString('en-US', options);
 
-  // Myanmar year
-  $('today-myanmar-year').textContent = `${m.year} မြန်မာသက္ကရာဇ်`;
+  // Buddhist Era (Sasana Year) Badge
+  const sasanaBadge = $('today-sasana-badge');
+  if (sasanaBadge) {
+    sasanaBadge.textContent = `${m.sasanaYear} BE (သာသနာနှစ် ${toMMNum(m.sasanaYear)})`;
+  }
 
-  // Myanmar date
+  // Myanmar Year
+  $('today-myanmar-year').textContent = `${m.year} ME • ${toMMNum(m.year)} ခုနှစ်`;
+
+  // Myanmar Date
   $('today-myanmar-date').textContent = info.formatted.myanmarDateMM;
 
-  // Moon phase
-  const moonSymbols = ['🌙', '🌕', '🌗', '🌑'];
-  $('today-moon').textContent = moonSymbols[m.moonPhase] || '🌙';
+  // Moon Phase & Sabbath Badge
+  const moonSymbols = ['🌙 Waxing', '🌕 Full Moon', '🌗 Waning', '🌑 New Moon'];
+  const moonSymbolsMM = ['လဆန်း', 'လပြည့်', 'လဆုတ်', 'လကွယ်'];
+  $('today-moon').textContent = `${moonSymbols[m.moonPhase]} (${moonSymbolsMM[m.moonPhase]})`;
 
-  // Weekday
-  $('today-weekday').textContent = `${ast.weekdayNameMM} • ${ast.weekdayName}`;
+  const sabbathBadge = $('today-sabbath-badge');
+  if (sabbathBadge) {
+    if (aup.sabbath === 1) {
+      sabbathBadge.textContent = '☸️ ဥပုသ်နေ့ (Sabbath)';
+      sabbathBadge.classList.add('visible');
+    } else if (aup.sabbath === 2) {
+      sabbathBadge.textContent = '☸️ အဖိတ်နေ့ (Eve)';
+      sabbathBadge.classList.add('visible');
+    } else {
+      sabbathBadge.classList.remove('visible');
+    }
+  }
 
-  // Auspicious badges
-  const container = $('auspicious-items');
-  container.innerHTML = '';
+  // Weekday Name
+  $('today-weekday').textContent = `${ast.weekdayName} (${ast.weekdayNameMM})`;
+
+  // Auspicious Badges
+  const itemsContainer = $('auspicious-items');
+  itemsContainer.innerHTML = '';
 
   const badges = [];
-  if (aup.isYatyaza)      badges.push({ cls: 'yatyaza',       label: 'Yatyaza ⭐' });
-  if (aup.isPyathada)     badges.push({ cls: 'pyathada',      label: 'Pyathada ⚠️' });
-  if (aup.isAmyeittasote) badges.push({ cls: 'amyeittasote',  label: 'Amyeittasote 💎' });
-  if (aup.isWarameittugyi)badges.push({ cls: 'warameittugyi', label: 'Warameittugyi 🌟' });
-  if (badges.length === 0) badges.push({ cls: 'none', label: 'Regular Day' });
+  if (aup.isYatyaza)       badges.push({ name: 'Yatyaza (ရက်ရာဇာ)',         cls: 'yatyaza',       icon: '⭐' });
+  if (aup.isPyathada)      badges.push({ name: 'Pyathada (ပြဿဒါး)',        cls: 'pyathada',      icon: '⚠️' });
+  if (aup.isAfternoonPyathada) badges.push({ name: 'Afternoon Pyathada (မွန်းလွဲ)', cls: 'pyathada', icon: '⚠️' });
+  if (aup.isAmyeittasote)  badges.push({ name: 'Amyeittasote (အမြိုက်စိုတ်)',    cls: 'amyeittasote',  icon: '💎' });
+  if (aup.isWarameittugyi) badges.push({ name: 'Warameittugyi (ဝါရမိတ္တုကြီး)', cls: 'warameittugyi', icon: '🌟' });
+  if (aup.isNagapor)       badges.push({ name: 'Nagapor (နဂါးပေါ်)',         cls: 'nagapor',       icon: '🐉' });
+  if (aup.isYatpote)       badges.push({ name: 'Yatpote (ရက်ပုပ်)',         cls: 'holiday',       icon: '🛑' });
+  if (aup.sabbath === 1)   badges.push({ name: 'Uposatha (ဥပုသ်နေ့)',       cls: 'amyeittasote',  icon: '☸️' });
+
+  // Add Mahabote & Nakhat summary
+  badges.push({
+    name: `House: ${aup.mahaboteMM} (${aup.mahabote})`,
+    cls: 'yatyaza',
+    icon: '🔮'
+  });
+  badges.push({
+    name: `Nagahle: ${aup.nagahleMM}`,
+    cls: 'warameittugyi',
+    icon: '🧭'
+  });
 
   badges.forEach(b => {
-    const el = document.createElement('span');
-    el.className = `ausp-badge ${b.cls}`;
-    el.textContent = b.label;
-    container.appendChild(el);
+    const item = document.createElement('div');
+    item.className = 'auspicious-item';
+    item.innerHTML = `
+      <span class="auspicious-dot ${b.cls}"></span>
+      <span class="badge-icon">${b.icon}</span>
+      <span>${b.name}</span>
+    `;
+    itemsContainer.appendChild(item);
   });
 }
 
 function renderThingyan(info) {
   if (!info) return;
-  const { daysUntil, thingyan, isNow } = info;
 
-  if (isNow) {
-    $('thingyan-countdown').textContent = '🎉 NOW!';
-    $('thingyan-date').textContent = `Myanmar New Year ${thingyan.myanmarYear} ME`;
+  const countdownEl = $('thingyan-countdown');
+  const dateEl = $('thingyan-date');
+  const timingEl = $('thingyan-timing');
+
+  if (info.isNow) {
+    countdownEl.textContent = '🎉 THINGYAN IS NOW! 🎉';
+    countdownEl.style.color = 'var(--accent-primary)';
   } else {
-    $('thingyan-countdown').textContent = `${daysUntil} days`;
-    const d = thingyan.akyoDay;
-    if (d) {
-      $('thingyan-date').textContent =
-        `Thingyan ${GREGORIAN_MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    countdownEl.textContent = `${info.daysUntil} Days`;
+  }
+
+  if (info.thingyan) {
+    const tg = info.thingyan;
+    dateEl.textContent = `Akyo: ${info.akyoDateStr} • Year ${tg.myanmarYear} ME`;
+    if (timingEl && tg.transitTiming) {
+      timingEl.textContent = `Akya: ${tg.transitTiming.akyaTimeStr} | Atat: ${tg.transitTiming.atatTimeStr}`;
+    }
+
+    // Detail card in Astrology view
+    const detailEl = $('thingyan-detail-content');
+    if (detailEl) {
+      detailEl.innerHTML = `
+        <div class="timing-highlight">
+          💧 Solar Transit: Akya at ${tg.transitTiming.akyaTimeStr} | Atat at ${tg.transitTiming.atatTimeStr}
+        </div>
+        <p><strong>A-kyo Day (သင်္ကြန်အကြို):</strong> ${info.akyoDateStr} — Thagyamin descends.</p>
+        <p><strong>A-kya Day (သင်္ကြန်အကျ):</strong> Water festival begins across Myanmar.</p>
+        <p><strong>A-tat Day (သင်္ကြန်အတက်):</strong> Thagyamin ascends back to Tavatimsa.</p>
+        <p><strong>Myanmar New Year (နှစ်ဆန်းတစ်ရက်):</strong> ${info.newYearDateStr} — Year ${tg.myanmarYear} ME begins (${tg.sasanaYear} BE).</p>
+        <p style="font-family:var(--font-myanmar);color:var(--accent-primary);margin-top:4px;">${tg.mythology.descMM}</p>
+      `;
     }
   }
 }
 
 // ─── Month View Rendering ─────────────────────────────────────────────────────
+
 function renderMonthView(data) {
   if (!data) return;
 
-  const { year, month, firstDayOfWeek, totalDays, days, holidays } = data;
+  // Header Title
+  $('month-title').textContent = `${GREGORIAN_MONTHS[data.month - 1]} ${data.year}`;
+  $('month-subtitle-mm').textContent =
+    `${data.primaryMMMonthMM} ${toMMNum(data.primaryMMYear)} ခုနှစ် (သာသနာနှစ် ${toMMNum(data.primarySasanaYear)})`;
 
-  // Header
-  $('month-title').textContent = `${GREGORIAN_MONTHS[month - 1]} ${year}`;
-
-  // Get Myanmar month name from first day of the month
-  const firstDayMM = days[0];
-  if (firstDayMM && firstDayMM.myanmar) {
-    $('month-subtitle-mm').textContent =
-      `${firstDayMM.myanmar.monthNameMM} ၊ ${firstDayMM.myanmar.year} မြန်မာသက္ကရာဇ်`;
-  }
-
-  // Build grid
   const grid = $('calendar-grid');
   grid.innerHTML = '';
 
-  const weekdays = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  // 1. Previous month trailing days
+  const prevMonthTotalDays = new Date(data.year, data.month - 1, 0).getDate();
+  const firstDay = data.firstDayOfWeek; // 0=Sun..6=Sat
 
-  // Previous month filler days
-  const prevMonthDays = firstDayOfWeek;
-  const prevMonth = month === 1 ? 12 : month - 1;
-  const prevYear = month === 1 ? year - 1 : year;
-  const prevMonthTotal = new Date(prevYear, prevMonth, 0).getDate();
-
-  for (let i = prevMonthDays - 1; i >= 0; i--) {
-    const dayNum = prevMonthTotal - i;
-    const cell = document.createElement('div');
-    cell.className = 'cal-day other-month';
-    cell.innerHTML = `<div class="day-num">${dayNum}</div>`;
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const dayNum = prevMonthTotalDays - i;
+    const cell = createCalendarCell({
+      gregorian: { day: dayNum },
+      isOtherMonth: true,
+    });
     grid.appendChild(cell);
   }
 
-  // Current month days
-  days.forEach((dayInfo, idx) => {
-    const dayNum = idx + 1;
-    const cell = createDayCell(dayInfo, dayNum, year, month);
+  // 2. Current month days
+  data.days.forEach(dayInfo => {
+    const cell = createCalendarCell({
+      ...dayInfo,
+      isOtherMonth: false,
+    });
     grid.appendChild(cell);
   });
 
-  // Next month filler
-  const totalCells = prevMonthDays + totalDays;
-  const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-  for (let i = 1; i <= remainingCells; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'cal-day other-month';
-    cell.innerHTML = `<div class="day-num">${i}</div>`;
+  // 3. Next month leading days (fill 42 or 35 cells)
+  const totalCells = grid.children.length;
+  const remaining = (totalCells <= 35 ? 35 : 42) - totalCells;
+  for (let i = 1; i <= remaining; i++) {
+    const cell = createCalendarCell({
+      gregorian: { day: i },
+      isOtherMonth: true,
+    });
     grid.appendChild(cell);
   }
 }
 
-function createDayCell(dayInfo, dayNum, year, month) {
-  const { myanmar, auspicious, holidays, isToday, isWeekend, gregorian } = dayInfo;
-  const weekday = gregorian ? gregorian.weekday : 0;
-  const isSunday = weekday === 0;
-  const isSaturday = weekday === 6;
-
+function createCalendarCell(dayInfo) {
   const cell = document.createElement('div');
-  let cellClass = 'cal-day';
-  if (isToday) cellClass += ' today';
-  if (isWeekend) cellClass += ' weekend';
-  if (isSunday) cellClass += ' sunday';
-  cell.className = cellClass;
+  cell.className = 'calendar-day cal-day';
 
-  // Indicators
-  const indicators = [];
-  if (auspicious) {
-    if (auspicious.isYatyaza)       indicators.push('<span class="day-indicator yatyaza"></span>');
-    if (auspicious.isPyathada)      indicators.push('<span class="day-indicator pyathada"></span>');
-    if (auspicious.isAmyeittasote)  indicators.push('<span class="day-indicator amyeittasote"></span>');
-    if (auspicious.isWarameittugyi) indicators.push('<span class="day-indicator warameittugyi"></span>');
+  if (dayInfo.isOtherMonth) {
+    cell.classList.add('other-month');
+    cell.innerHTML = `
+      <div class="day-number-row">
+        <span class="day-num">${dayInfo.gregorian.day}</span>
+      </div>
+    `;
+    return cell;
   }
+
+  const { gregorian, myanmar, auspicious, holidays } = dayInfo;
+  const now = new Date();
+  const isToday = dayInfo.isToday || (
+    gregorian.year === now.getFullYear() &&
+    gregorian.month === (now.getMonth() + 1) &&
+    gregorian.day === now.getDate()
+  );
+
+  if (isToday) cell.classList.add('today');
+  if (gregorian.weekday === 0) cell.classList.add('sunday');
+  if (gregorian.weekday === 6) cell.classList.add('saturday', 'weekend');
+  if (auspicious.isYatyaza)       cell.classList.add('yatyaza');
+  if (auspicious.isPyathada)      cell.classList.add('pyathada');
+  if (auspicious.isAmyeittasote)  cell.classList.add('amyeittasote');
+  if (auspicious.isWarameittugyi) cell.classList.add('warameittugyi');
+  if (auspicious.isNagapor)       cell.classList.add('nagapor');
+  if (auspicious.sabbath === 1)   cell.classList.add('sabbath');
+
+  // Moon Symbol
+  const moonSymbols = ['🌙', '🌕', '🌗', '🌑'];
+  const moonIcon = moonSymbols[myanmar.moonPhase] || '';
+
+  // Generate badges
+  const tags = [];
   if (holidays && holidays.length > 0) {
-    indicators.push('<span class="day-indicator holiday"></span>');
+    const holidayName = holidays[0].name.length > 12 ? holidays[0].name.slice(0, 10) + '…' : holidays[0].name;
+    tags.push(`<span class="cell-tag holiday" title="${holidays[0].name}">${holidayName}</span>`);
+  }
+  if (auspicious.isYatyaza) {
+    tags.push(`<span class="cell-tag yatyaza">ရက်ရာဇာ</span>`);
+  }
+  if (auspicious.isPyathada) {
+    tags.push(`<span class="cell-tag pyathada">ပြဿဒါး</span>`);
+  }
+  if (auspicious.isAfternoonPyathada) {
+    tags.push(`<span class="cell-tag pyathada">မွန်းလွဲ</span>`);
+  }
+  if (auspicious.isAmyeittasote) {
+    tags.push(`<span class="cell-tag amyeittasote">အမြိုက်စိုတ်</span>`);
+  }
+  if (auspicious.isNagapor) {
+    tags.push(`<span class="cell-tag nagapor">နဂါးပေါ်</span>`);
+  }
+  if (auspicious.sabbath === 1) {
+    tags.push(`<span class="cell-tag sabbath">ဥပုသ်</span>`);
+  } else if (auspicious.sabbath === 2) {
+    tags.push(`<span class="cell-tag sabbath-eve">အဖိတ်</span>`);
   }
 
-  // Moon phase
-  let moonHtml = '';
-  if (myanmar) {
-    const moonPhase = myanmar.moonPhase;
-    const moonSymbols = ['', '🌕', '', '🌑'];
-    const moonClass = moonPhase === 1 ? 'full' : moonPhase === 3 ? 'new' : '';
-    if (moonSymbols[moonPhase]) {
-      moonHtml = `<div class="day-moon ${moonClass}">${moonSymbols[moonPhase]}</div>`;
-    }
-    // Waxing/waning lunar day number
-    if (!moonSymbols[moonPhase] && myanmar.moonDay) {
-      const phaseChar = moonPhase === 0 ? '↑' : '↓';
-      moonHtml = `<div class="day-moon">${phaseChar}${myanmar.moonDay}</div>`;
-    }
-  }
-
-  // Myanmar date text
-  let myanmarHtml = '';
-  if (myanmar) {
-    const phaseMM = ['လဆန်း','လပြည့်','လဆုတ်','လကွယ်'];
-    if (myanmar.moonPhase === 1) {
-      myanmarHtml = `${myanmar.monthNameMM}<br>လပြည့်`;
-    } else if (myanmar.moonPhase === 3) {
-      myanmarHtml = `${myanmar.monthNameMM}<br>လကွယ်`;
-    } else {
-      myanmarHtml = `${phaseMM[myanmar.moonPhase]} ${myanmar.moonDay}`;
-    }
-  }
-
-  // Holiday label
-  let holidayHtml = '';
-  if (holidays && holidays.length > 0) {
-    const h = holidays[0];
-    holidayHtml = `<div class="day-holiday-label">${h.name}</div>`;
-  }
+  const todayPill = isToday ? '<span class="today-pill" title="Today / ယနေ့">TODAY</span>' : '';
 
   cell.innerHTML = `
-    <div class="day-indicators">${indicators.join('')}</div>
-    <div class="day-num">${dayNum}</div>
-    ${moonHtml}
-    <div class="day-myanmar">${myanmarHtml}</div>
-    ${holidayHtml}
+    <div class="day-number-row">
+      <div class="day-num-wrap">
+        <span class="day-num ${isToday ? 'today-num' : ''}">${gregorian.day}</span>
+        ${todayPill}
+      </div>
+      <span class="day-moon-icon" title="${myanmar.moonPhaseName} (${myanmar.moonPhaseNameMM})">${moonIcon}</span>
+    </div>
+    <div class="day-myanmar-num">${toMMNum(myanmar.fortnightDay)}</div>
+    <div class="day-myanmar-sub">${myanmar.moonPhaseNameMM}</div>
+    <div class="day-tags-container">
+      ${tags.slice(0, 2).join('')}
+    </div>
   `;
 
-  // Click handler
-  cell.addEventListener('click', () => showDayModal(dayInfo, dayNum, year, month));
+  cell.addEventListener('click', () => {
+    $$('.calendar-day.selected, .cal-day.selected').forEach(c => c.classList.remove('selected'));
+    cell.classList.add('selected');
+    showDayModal(dayInfo);
+  });
 
   return cell;
 }
 
-// ─── Year View Rendering ──────────────────────────────────────────────────────
-function renderYearView(data) {
-  if (!data) return;
+// ─── Day Detail Modal ─────────────────────────────────────────────────────────
 
-  $('year-title').textContent = data.year;
-  $('year-subtitle-mm').textContent = `မြန်မာသက္ကရာဇ် ${data.year - 638}`;
-
-  const grid = $('year-grid');
-  grid.innerHTML = '';
-
-  data.months.forEach((monthData, idx) => {
-    const monthNum = idx + 1;
-    const miniEl = createMiniMonth(monthData, data.year, monthNum);
-    grid.appendChild(miniEl);
-  });
-}
-
-function createMiniMonth(monthData, year, month) {
-  const container = document.createElement('div');
-  container.className = 'mini-month';
-
-  const firstDayMM = monthData.days[0];
-  const mmMonthName = firstDayMM?.myanmar?.monthNameMM || '';
-
-  container.innerHTML = `
-    <div class="mini-month-title">${GREGORIAN_MONTHS[month - 1]}</div>
-    <div class="mini-month-mm">${mmMonthName}</div>
-    <div class="mini-grid">
-      ${WEEKDAY_SHORT.map(d => `<div class="mini-day-header">${d}</div>`).join('')}
-      ${buildMiniDays(monthData, year, month)}
-    </div>
-  `;
-
-  container.addEventListener('click', () => {
-    state.currentYear = year;
-    state.currentMonth = month;
-    switchView('month');
-    loadMonthView(year, month);
-  });
-
-  return container;
-}
-
-function buildMiniDays(monthData, year, month) {
-  const { firstDayOfWeek, totalDays, days } = monthData;
-  let html = '';
-
-  // Filler
-  for (let i = 0; i < firstDayOfWeek; i++) {
-    html += '<div class="mini-day other-m"></div>';
-  }
-
-  days.forEach((dayInfo, idx) => {
-    const dayNum = idx + 1;
-    const weekday = dayInfo.gregorian ? dayInfo.gregorian.weekday : (firstDayOfWeek + idx) % 7;
-    let cls = 'mini-day';
-    if (dayInfo.isToday) cls += ' today-mini';
-    if (dayInfo.holidays && dayInfo.holidays.length > 0) cls += ' has-holiday';
-    if (dayInfo.myanmar && dayInfo.myanmar.moonPhase === 1) cls += ' has-full-moon';
-    if (weekday === 0) cls += ' sunday-mini';
-    if (weekday === 6) cls += ' saturday-mini';
-    html += `<div class="${cls}">${dayNum}</div>`;
-  });
-
-  return html;
-}
-
-// ─── Day Modal ────────────────────────────────────────────────────────────────
-function showDayModal(dayInfo, dayNum, year, month) {
-  if (!dayInfo || !dayInfo.myanmar) return;
+function showDayModal(dayInfo) {
+  const modal = $('day-modal');
+  const overlay = $('modal-overlay');
+  const content = $('modal-content');
 
   const { gregorian, myanmar, auspicious, astrology, holidays, formatted } = dayInfo;
-  const weekdayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const weekday = gregorian ? weekdayNames[gregorian.weekday] : '';
-  const moonSymbols = ['🌙', '🌕', '🌗', '🌑'];
+  const date = new Date(gregorian.year, gregorian.month - 1, gregorian.day);
 
-  const holidaysHtml = holidays && holidays.length > 0
-    ? holidays.map(h => `
-        <div class="modal-holiday ${h.type || 'festival'}">
-          <div class="modal-holiday-name">${h.name}</div>
-          ${h.nameMM ? `<div class="modal-holiday-mm">${h.nameMM}</div>` : ''}
-          ${h.description ? `<div class="modal-holiday-desc">${h.description}</div>` : ''}
-        </div>
-      `).join('')
-    : '<div style="color:var(--text-muted);font-size:12px;">No holidays</div>';
+  const signsBadges = (auspicious.signsMM || []).map(s => {
+    let cls = 'yatyaza';
+    if (s.includes('ပြဿဒါး') || s.includes('ရက်ပုပ်') || s.includes('ယုတ်မာ') || s.includes('ရက်ကြမ်း')) cls = 'pyathada';
+    else if (s.includes('အမြိုက်') || s.includes('ဥပုသ်')) cls = 'amyeittasote';
+    else if (s.includes('ဝါရမိတ္တု')) cls = 'warameittugyi';
+    else if (s.includes('နဂါးပေါ်')) cls = 'nagapor';
+    return `<span class="modal-badge ${cls}">${s}</span>`;
+  }).join('');
 
-  const badges = [];
-  if (auspicious) {
-    if (auspicious.isYatyaza)       badges.push({ cls: 'yatyaza',       label: '⭐ Yatyaza' });
-    if (auspicious.isPyathada)      badges.push({ cls: 'pyathada',      label: '⚠️ Pyathada' });
-    if (auspicious.isAmyeittasote)  badges.push({ cls: 'amyeittasote',  label: '💎 Amyeittasote' });
-    if (auspicious.isWarameittugyi) badges.push({ cls: 'warameittugyi', label: '🌟 Warameittugyi' });
-  }
-  const badgesHtml = badges.length > 0
-    ? badges.map(b => `<span class="modal-badge ${b.cls}" style="background:var(--${b.cls}-bg);border-color:var(--${b.cls}-color);color:var(--${b.cls}-color)">${b.label}</span>`).join('')
-    : '<span style="color:var(--text-muted);font-size:12px;">No special signs today</span>';
-
-  const moonPhaseMM = ['လဆန်း','လပြည့်','လဆုတ်','လကွယ်'];
-
-  $('modal-content').innerHTML = `
-    <div class="modal-date-header">
-      <div class="modal-gregorian">${weekday}, ${GREGORIAN_MONTHS[month-1]} ${dayNum}, ${year}</div>
-      <div class="modal-myanmar-main">${formatted ? formatted.myanmarDateMM : ''}</div>
-      <div class="modal-myanmar-year">${myanmar.year} မြန်မာသက္ကရာဇ် ${myanmar.isWatat ? '(Watat Year)' : ''}</div>
+  const holidaysHtml = (holidays || []).map(h => `
+    <div class="modal-holiday ${h.type || 'festival'}">
+      <div class="modal-holiday-name">${h.name}</div>
+      <div class="modal-holiday-mm">${h.nameMM || ''}</div>
+      ${h.description ? `<div class="modal-holiday-desc">${h.description}</div>` : ''}
     </div>
+  `).join('');
 
-    <div class="modal-section">
-      <div class="modal-section-title">Myanmar Calendar Details</div>
-      <div class="modal-grid-2">
-        <div class="modal-info-item">
-          <div class="modal-info-label">Myanmar Month</div>
-          <div class="modal-info-value mm">${myanmar.monthNameMM}</div>
-          <div class="modal-info-value" style="font-size:11px;color:var(--text-muted)">${myanmar.monthName}</div>
-        </div>
-        <div class="modal-info-item">
-          <div class="modal-info-label">Moon Phase</div>
-          <div class="modal-info-value">${moonSymbols[myanmar.moonPhase]} ${myanmar.moonPhaseName}</div>
-          <div class="modal-info-value mm" style="font-size:11px;color:var(--text-muted)">${moonPhaseMM[myanmar.moonPhase]}</div>
-        </div>
-        <div class="modal-info-item">
-          <div class="modal-info-label">Lunar Day</div>
-          <div class="modal-info-value">${myanmar.moonPhase === 1 ? 'Full Moon (15th)' : myanmar.moonPhase === 3 ? 'New Moon (30th)' : `${myanmar.moonPhaseName} ${myanmar.moonDay}`}</div>
-        </div>
-        <div class="modal-info-item">
-          <div class="modal-info-label">Weekday</div>
-          <div class="modal-info-value">${weekday}</div>
-          <div class="modal-info-value mm" style="font-size:11px;color:var(--text-muted)">${astrology ? astrology.weekdayNameMM : ''}</div>
-        </div>
-        ${astrology ? `
-        <div class="modal-info-item">
-          <div class="modal-info-label">Mahabote</div>
-          <div class="modal-info-value">${auspicious ? auspicious.mahabote : '—'}</div>
-          <div class="modal-info-value mm" style="font-size:11px;color:var(--text-muted)">${auspicious ? auspicious.mahaboteMM : ''}</div>
-        </div>
-        <div class="modal-info-item">
-          <div class="modal-info-label">Nakhat</div>
-          <div class="modal-info-value">${astrology.nakhat}</div>
-          <div class="modal-info-value mm" style="font-size:11px;color:var(--text-muted)">${astrology.nakhatMM}</div>
-        </div>
-        ` : ''}
+  content.innerHTML = `
+    <div class="modal-date-header">
+      <div class="modal-gregorian">
+        ${date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+      </div>
+      <div class="modal-myanmar-main">${formatted.myanmarDateMM}</div>
+      <div class="modal-myanmar-year">
+        မြန်မာသက္ကရာဇ် ${toMMNum(myanmar.year)} ခုနှစ် • သာသနာနှစ် ${toMMNum(myanmar.sasanaYear)} BE
       </div>
     </div>
 
+    ${holidaysHtml ? `
+      <div class="modal-section">
+        <div class="modal-section-title">Holidays & Observances (ပွဲတော်/အားလပ်ရက်များ)</div>
+        ${holidaysHtml}
+      </div>
+    ` : ''}
+
     <div class="modal-section">
-      <div class="modal-section-title">Auspicious Signs</div>
-      <div class="modal-badges">${badgesHtml}</div>
+      <div class="modal-section-title">Auspicious & Traditional Signs (မင်္ဂလာဆိုင်ရာ အချက်အလက်များ)</div>
+      <div class="modal-badges">${signsBadges || '<span style="color:var(--text-muted);font-size:12px;">Regular day (သာမန်နေ့)</span>'}</div>
     </div>
 
     <div class="modal-section">
-      <div class="modal-section-title">Holidays & Festivals</div>
-      ${holidaysHtml}
+      <div class="modal-section-title">Lunisolar & Astrological Attributes (နက္ခတ်ဗေဒင် အသေးစိတ်)</div>
+      <div class="modal-grid-2">
+        <div class="modal-info-item">
+          <span class="modal-info-label">Moon Phase (လဆန်း/လဆုတ်)</span>
+          <span class="modal-info-value">${myanmar.moonPhaseName} (${myanmar.moonPhaseNameMM} ${toMMNum(myanmar.fortnightDay)} ရက်)</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Month & Year Type (ဝါထပ်အမျိုးအစား)</span>
+          <span class="modal-info-value">${myanmar.watatLabel}</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Uposatha Sabbath (ဥပုသ်/အဖိတ်)</span>
+          <span class="modal-info-value">${auspicious.sabbathStrMM || 'သာမန်နေ့'}</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Mahabote House (မဟာဘုတ် အိမ်)</span>
+          <span class="modal-info-value mm">${auspicious.mahaboteMM} (${auspicious.mahabote})</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Nagahle Head Heading (နဂါးခေါင်းလှည့်)</span>
+          <span class="modal-info-value mm">${auspicious.nagahleMM} (${auspicious.nagahle})</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Nakhat 12 Zodiac (နဂါးစက်ဝိုင်း)</span>
+          <span class="modal-info-value">${astrology.nakhat12.emoji} ${astrology.nakhat12.nameMM} (${astrology.nakhat12.name})</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">3-Nakhat Being (နက္ခတ် ၃ မျိုး)</span>
+          <span class="modal-info-value mm">${astrology.nakhat3.nameMM} (${astrology.nakhat3.name})</span>
+        </div>
+        <div class="modal-info-item">
+          <span class="modal-info-label">Planetary Ruler (ဂြိုဟ်မင်း)</span>
+          <span class="modal-info-value">${astrology.planetaryRuler.planetMM} (${astrology.planetaryRuler.name})</span>
+        </div>
+      </div>
     </div>
   `;
 
-  $('modal-overlay').classList.add('visible');
+  overlay.classList.add('visible');
 }
 
-// ─── Date Converter ───────────────────────────────────────────────────────────
+function closeModal() {
+  $('modal-overlay').classList.remove('visible');
+}
+
+// ─── Auspicious Date Finder Logic ─────────────────────────────────────────────
+
+async function searchAuspiciousDates() {
+  const container = $('finder-results-list');
+  const countEl = $('finder-results-count');
+  container.innerHTML = '<div class="result-placeholder">Searching calendar engine for optimal auspicious dates...</div>';
+
+  try {
+    const year = parseInt($('finder-year-select')?.value) || state.currentYear;
+    const month = parseInt($('finder-month-select')?.value) || state.currentMonth;
+    const purpose = state.finderPurpose || 'wedding';
+
+    const results = await window.myanmarCalendar.findAuspiciousDates(purpose, year, month, 12);
+
+    if (!results || results.length === 0) {
+      container.innerHTML = '<div class="result-placeholder">No matching dates found for this criteria in the selected range.</div>';
+      if (countEl) countEl.textContent = '0 dates found';
+      return;
+    }
+
+    if (countEl) countEl.textContent = `${results.length} auspicious dates found`;
+    container.innerHTML = '';
+
+    results.forEach(res => {
+      const item = document.createElement('div');
+      item.className = 'finder-result-item';
+
+      const reasonsHtml = res.matchReasons.map(r => `<span class="reason-tag">✓ ${r}</span>`).join('');
+      const cautionsHtml = (res.cautions || []).map(c => `<span class="caution-tag">⚠️ ${c}</span>`).join('');
+
+      item.innerHTML = `
+        <div class="result-date-col">
+          <div class="result-gregorian-text">${res.gregorianStr}</div>
+          <div class="result-myanmar-text">${res.myanmarDateMM}</div>
+          <div class="result-english-sub">${res.myanmarDateStr}</div>
+        </div>
+        <div class="result-reasons-col">
+          ${reasonsHtml}
+          ${cautionsHtml}
+        </div>
+        <div class="result-score-col">
+          <div class="score-badge">${res.score}</div>
+          <div class="score-label">Favorable Score</div>
+        </div>
+      `;
+
+      item.addEventListener('click', async () => {
+        const fullDate = await window.myanmarCalendar.getMyanmarDate(new Date(res.date).toISOString());
+        showDayModal(fullDate);
+      });
+
+      container.appendChild(item);
+    });
+  } catch (err) {
+    container.innerHTML = `<div style="color:var(--pyathada-color);padding:20px;">Error finding dates: ${err.message}</div>`;
+  }
+}
+
+// ─── Bidirectional Date Converter ─────────────────────────────────────────────
+
 async function convertToMyanmar() {
   const input = $('gregorian-input').value;
   if (!input) return;
@@ -516,25 +616,26 @@ async function convertToMyanmar() {
 
     const badges = [];
     if (auspicious) {
-      if (auspicious.isYatyaza)       badges.push({ cls: 'yatyaza',       label: '⭐ Yatyaza' });
-      if (auspicious.isPyathada)      badges.push({ cls: 'pyathada',      label: '⚠️ Pyathada' });
-      if (auspicious.isAmyeittasote)  badges.push({ cls: 'amyeittasote',  label: '💎 Amyeittasote' });
+      if (auspicious.isYatyaza)       badges.push({ cls: 'yatyaza',       label: '⭐ Yatyaza (ရက်ရာဇာ)' });
+      if (auspicious.isPyathada)      badges.push({ cls: 'pyathada',      label: '⚠️ Pyathada (ပြဿဒါး)' });
+      if (auspicious.isAmyeittasote)  badges.push({ cls: 'amyeittasote',  label: '💎 Amyeittasote (အမြိုက်စိုတ်)' });
       if (auspicious.isWarameittugyi) badges.push({ cls: 'warameittugyi', label: '🌟 Warameittugyi' });
+      if (auspicious.isNagapor)       badges.push({ cls: 'nagapor',       label: '🐉 Nagapor (နဂါးပေါ်)' });
+      if (auspicious.sabbath === 1)   badges.push({ cls: 'sabbath',       label: '☸️ Sabbath (ဥပုသ်)' });
     }
 
     $('myanmar-result').innerHTML = `
       <div class="result-main">${formatted.myanmarDateMM}</div>
       <div class="result-sub">
         <strong>${formatted.myanmarDate}</strong><br>
-        Myanmar Year: <strong>${myanmar.year} ME</strong><br>
-        Moon Phase: ${moonSymbols[myanmar.moonPhase]} ${myanmar.moonPhaseName}<br>
+        Myanmar Year: <strong>${myanmar.year} ME (သာသနာနှစ် ${toMMNum(myanmar.sasanaYear)} BE)</strong><br>
+        Moon Phase: ${moonSymbols[myanmar.moonPhase]} ${myanmar.moonPhaseName} (${myanmar.moonPhaseNameMM})<br>
+        Mahabote House: <strong>${auspicious.mahaboteMM} (${auspicious.mahabote})</strong> • Nagahle: <strong>${auspicious.nagahleMM}</strong><br>
         Weekday: ${astrology ? astrology.weekdayName + ' (' + astrology.weekdayNameMM + ')' : '—'}
       </div>
-      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">
         ${badges.map(b => `
-          <span class="result-badge"
-            style="background:var(--${b.cls}-bg);color:var(--${b.cls}-color);border:1px solid var(--${b.cls}-color)"
-          >${b.label}</span>
+          <span class="modal-badge ${b.cls}">${b.label}</span>
         `).join('')}
       </div>
     `;
@@ -543,83 +644,61 @@ async function convertToMyanmar() {
   }
 }
 
-function convertToGregorian() {
-  // Simple approximation for Myanmar → Gregorian
-  const myYear = parseInt($('myanmar-year-input').value);
-  const myMonth = parseInt($('myanmar-month-input').value);
-  const moonPhase = parseInt($('moon-phase-input').value);
-  const moonDay = parseInt($('moon-day-input').value) || 1;
+async function convertToGregorian() {
+  const myYear = parseInt($('myanmar-year-input').value, 10);
+  const myMonth = parseInt($('myanmar-month-input').value, 10);
+  const moonPhase = parseInt($('moon-phase-input').value, 10);
+  const moonDay = parseInt($('moon-day-input').value, 10) || 1;
 
   if (!myYear || isNaN(myYear)) {
     $('gregorian-result').innerHTML = '<div style="color:var(--pyathada-color)">Please enter a valid Myanmar year</div>';
     return;
   }
 
-  // Approximate Gregorian year
-  const gYear = myYear + 638;
-
-  // Myanmar months approximate Gregorian months (starting from Tagu = April)
-  const monthOffset = [
-    0,  // 2nd Waso (intercalary)
-    3,  // Tagu (1) → April
-    4,  // Kason (2) → May
-    5,  // Nayon (3) → June
-    6,  // Waso (4) → July
-    7,  // Wagaung (5) → Aug
-    8,  // Tawthalin (6) → Sep
-    9,  // Thadingyut (7) → Oct
-    10, // Tazaungmon (8) → Nov
-    11, // Nadaw (9) → Dec
-    0,  // Pyatho (10) → Jan (next year)
-    1,  // Tabodwe (11) → Feb
-    2,  // Tabaung (12) → Mar
-  ];
-
-  let gMonth = myMonth === 0 ? 6 : (monthOffset[myMonth] || 0) + 1;
-  let adjustedYear = gYear;
-  if (myMonth >= 10 && myMonth <= 12) {
-    adjustedYear = gYear + 1; // These months fall in next Gregorian year
+  // Calculate month day (md from 1 to 30) based on moon phase
+  let md;
+  if (moonPhase === 0) {
+    md = moonDay; // Waxing 1-14
+  } else if (moonPhase === 1) {
+    md = 15;      // Full Moon
+  } else if (moonPhase === 2) {
+    md = 15 + moonDay; // Waning 1-14 (day 16-29)
+  } else {
+    md = 30;      // New Moon (or 29 for odd months)
   }
 
-  // Approximate day
-  let gDay;
-  if (moonPhase === 0) gDay = moonDay;         // Waxing
-  else if (moonPhase === 1) gDay = 15;          // Full moon
-  else if (moonPhase === 2) gDay = 15 + moonDay; // Waning
-  else gDay = 30;                               // New moon
+  try {
+    const res = await window.myanmarCalendar.convertMyanmarToGregorian(myYear, myMonth, md);
+    if (!res || !res.gregorian) {
+      $('gregorian-result').innerHTML = '<div style="color:var(--pyathada-color)">Calculation failed</div>';
+      return;
+    }
 
-  // Clamp to valid range
-  const maxDay = new Date(adjustedYear, gMonth, 0).getDate();
-  gDay = Math.min(gDay, maxDay);
+    const g = res.gregorian;
+    const gregDate = new Date(g.year, g.month - 1, g.day);
+    const dateStr = gregDate.toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
 
-  const MONTH_NAMES = ['January','February','March','April','May','June',
-                       'July','August','September','October','November','December'];
-  const MOON_NAMES = ['Waxing','Full Moon','Waning','New Moon'];
-  const MYANMAR_MONTH_NAMES = [
-    'Second Waso','Tagu','Kason','Nayon','Waso',
-    'Wagaung','Tawthalin','Thadingyut','Tazaungmon',
-    'Nadaw','Pyatho','Tabodwe','Tabaung'
-  ];
-
-  $('gregorian-result').innerHTML = `
-    <div class="result-main">~${MONTH_NAMES[gMonth - 1]} ${gDay}, ${adjustedYear}</div>
-    <div class="result-sub">
-      Approximate Gregorian date for:<br>
-      <strong>${MOON_NAMES[moonPhase]} ${moonPhase !== 1 && moonPhase !== 3 ? moonDay : ''} of ${MYANMAR_MONTH_NAMES[myMonth]}, ${myYear} ME</strong><br>
-      <em style="font-size:10px;color:var(--text-muted)">Note: Exact conversion requires precise astronomical calculation. This is an approximation.</em>
-    </div>
-  `;
+    $('gregorian-result').innerHTML = `
+      <div class="result-main">${dateStr}</div>
+      <div class="result-sub">
+        Exact Julian Day Number: <strong>${res.jdn}</strong><br>
+        Myanmar Date: <strong>${res.myanmarDate.formatted.myanmarDateMM}</strong><br>
+        Signs: ${res.myanmarDate.auspicious.signsMM.join(', ') || 'Regular Day'}<br>
+        Sasana Year: <strong>${toMMNum(res.myanmarDate.myanmar.sasanaYear)} BE</strong>
+      </div>
+    `;
+  } catch (err) {
+    $('gregorian-result').innerHTML = `<div style="color:var(--pyathada-color)">Error: ${err.message}</div>`;
+  }
 }
 
-// ─── Festivals Rendering ──────────────────────────────────────────────────────
+// ─── Festivals & iCal Export ──────────────────────────────────────────────────
+
 async function renderFestivals(year, monthsData) {
   const container = $('festivals-container');
   container.innerHTML = '';
-
-  const WEEKDAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-  // Also load Thingyan for this year
-  const thingyan = await window.myanmarCalendar.getThingyanCountdown();
 
   for (const { month, holidays } of monthsData) {
     if (!holidays || holidays.length === 0) continue;
@@ -627,21 +706,16 @@ async function renderFestivals(year, monthsData) {
     const section = document.createElement('div');
     section.className = 'festival-month';
 
-    const myanmarMonthName = holidays[0]?.myanmar?.monthNameMM || '';
-
     section.innerHTML = `
       <div class="festival-month-title">
         ${GREGORIAN_MONTHS[month - 1]} ${year}
-        <span class="festival-month-badge" style="background:rgba(244,185,66,0.1);color:var(--accent-primary);border:1px solid rgba(244,185,66,0.3)">
-          ${myanmarMonthName}
-        </span>
       </div>
     `;
 
     holidays.forEach(h => {
       const date = h.date ? new Date(h.date) : null;
       const dayNum = date ? date.getDate() : '?';
-      const weekday = date ? WEEKDAY_NAMES[date.getDay()] : '';
+      const weekday = date ? WEEKDAY_NAMES[date.getDay()].slice(0, 3) : '';
 
       const item = document.createElement('div');
       item.className = 'festival-item';
@@ -666,13 +740,27 @@ async function renderFestivals(year, monthsData) {
   if (container.children.length === 0) {
     container.innerHTML = `
       <div style="color:var(--text-muted);text-align:center;padding:40px">
-        No festivals data available for ${year}
+        No holidays recorded for ${year}
       </div>
     `;
   }
 }
 
-// ─── Astrology Views ──────────────────────────────────────────────────────────
+async function exportIcal(year) {
+  try {
+    const res = await window.myanmarCalendar.exportIcal(year);
+    if (res && res.success) {
+      showToast(`✅ Exported Myanmar holidays to: ${res.filePath}`);
+    } else if (res && !res.canceled) {
+      showToast('⚠️ Export canceled or failed');
+    }
+  } catch (err) {
+    showToast(`❌ Export error: ${err.message}`);
+  }
+}
+
+// ─── 8-Mansion Astrology & Mahabote ───────────────────────────────────────────
+
 function renderNakhatGrid() {
   const grid = $('nakhat-grid');
   if (!grid) return;
@@ -680,75 +768,125 @@ function renderNakhatGrid() {
 
   const today = new Date();
   const currentMyanmarYear = today.getFullYear() - 638;
-  const currentNakhat = currentMyanmarYear % 12;
+  const currentNakhatIdx = ((currentMyanmarYear % 12) + 12) % 12;
 
-  NAKHAT_ANIMALS.forEach((animal, idx) => {
-    const year = today.getFullYear() - (currentNakhat - idx + 12) % 12;
+  NAKHAT_12.forEach((animal, idx) => {
     const item = document.createElement('div');
-    item.className = `nakhat-item${idx === currentNakhat ? ' current-year' : ''}`;
+    const isCurrent = (idx === currentNakhatIdx);
+    item.className = `nakhat-item${isCurrent ? ' current-year' : ''}`;
     item.innerHTML = `
       <div class="nakhat-animal">${animal.emoji}</div>
-      <div class="nakhat-name">${animal.name}</div>
-      <div class="nakhat-year">${year} ME~</div>
+      <div class="nakhat-name">${animal.name} (${animal.nameMM})</div>
+      <div class="nakhat-year">${animal.element} • ${animal.my}</div>
+      ${isCurrent ? '<div style="font-size:9px;color:var(--accent-primary);margin-top:2px;font-weight:700;">★ THIS YEAR</div>' : ''}
     `;
     grid.appendChild(item);
   });
 }
 
-async function calculateMahabote() {
-  const input = $('birth-date-input').value;
-  if (!input) return;
+async function calculateMahaboteChart() {
+  const birthInput = $('birth-date-input').value;
+  if (!birthInput) {
+    showToast('Please select a birth date first.');
+    return;
+  }
+
+  const date = new Date(birthInput);
+  const weekday = date.getDay(); // 0=Sun..6=Sat
+  const my = date.getFullYear() - 638;
 
   try {
-    const info = await window.myanmarCalendar.getMyanmarDate(new Date(input).toISOString());
-    if (!info || !info.auspicious) return;
+    const chart = await window.myanmarCalendar.get8MansionChart(my, weekday, state.isWednesdayPM);
+    if (!chart || !chart.ruler) return;
 
-    const { auspicious, astrology, myanmar } = info;
-    const mahabote = auspicious.mahabote;
-    const data = MAHABOTE_DATA[mahabote];
+    const container = $('mahabote-chart-container');
+    const ruler = chart.ruler;
 
-    $('mahabote-result').innerHTML = `
-      <div class="mahabote-name">${mahabote}</div>
-      <div class="mahabote-mm">${auspicious.mahaboteMM}</div>
-      ${data ? `
-        <div class="mahabote-desc">
-          <strong>Ruling Planet:</strong> ${data.planet}<br>
-          <strong>Lucky Day:</strong> ${data.lucky}<br>
-          <strong>Nakhat:</strong> ${astrology.nakhat} (${astrology.nakhatMM})<br>
-          <strong>Myanmar Year:</strong> ${myanmar.year} ME<br>
-          <br>${data.desc}
+    const mansionsHtml = chart.mansions.map(m => `
+      <div class="mansion-card${m.isBirthHouse ? ' birth-house' : ''}">
+        ${m.isBirthHouse ? '<span class="birth-house-badge">Birth House</span>' : ''}
+        <div class="mansion-house-name">${m.key}</div>
+        <div class="mansion-house-mm">${m.nameMM}</div>
+        <div class="mansion-theme">${m.theme}</div>
+        <div class="mansion-ruler">Ruler: ${m.planetRuler}</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.3;">${m.desc}</div>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="mahabote-header-summary">
+        <div class="summary-pill">
+          <div class="summary-pill-label">Planetary Ruler (ဂြိုဟ်မင်း)</div>
+          <div class="summary-pill-val" style="color:${ruler.color}">${ruler.name} (${ruler.planetMM})</div>
         </div>
-      ` : ''}
+        <div class="summary-pill">
+          <div class="summary-pill-label">Animal Symbol (ရာသီသတ္တဝါ)</div>
+          <div class="summary-pill-val">${ruler.animal}</div>
+        </div>
+        <div class="summary-pill">
+          <div class="summary-pill-label">Lucky Direction (အရပ်မျက်နှာ)</div>
+          <div class="summary-pill-val">${ruler.direction}</div>
+        </div>
+        <div class="summary-pill">
+          <div class="summary-pill-label">Lucky Numbers (ကံကောင်းသောဂဏန်း)</div>
+          <div class="summary-pill-val">${ruler.luckyNum.join(', ')}</div>
+        </div>
+      </div>
+
+      <div class="mansions-grid">
+        ${mansionsHtml}
+      </div>
     `;
   } catch (err) {
-    $('mahabote-result').innerHTML = `<div style="color:var(--pyathada-color)">Error: ${err.message}</div>`;
+    showToast(`Chart calculation error: ${err.message}`);
   }
 }
 
+// ─── Toast Helper ─────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const container = $('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
 // ─── View Switching ───────────────────────────────────────────────────────────
+
 function switchView(viewName) {
-  // Update sidebar nav
   $$('.nav-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === viewName);
   });
 
-  // Update views
   $$('.view').forEach(v => {
     v.classList.toggle('active', v.id === `view-${viewName}`);
   });
 
   state.currentView = viewName;
 
-  // Load view data if needed
   if (viewName === 'year' && !state.yearData) {
     loadYearView(state.yearViewYear);
   }
   if (viewName === 'festivals') {
     loadFestivals(state.festivalsYear);
   }
+  if (viewName === 'finder') {
+    searchAuspiciousDates();
+  }
 }
 
 // ─── Theme Toggle ─────────────────────────────────────────────────────────────
+
 function toggleTheme() {
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', state.theme);
@@ -765,6 +903,7 @@ function updateThemeUI() {
 }
 
 // ─── Event Listeners ──────────────────────────────────────────────────────────
+
 function setupEventListeners() {
   // Navigation buttons
   $$('.nav-btn').forEach(btn => {
@@ -788,50 +927,88 @@ function setupEventListeners() {
     const today = new Date();
     state.currentYear = today.getFullYear();
     state.currentMonth = today.getMonth() + 1;
+    loadTodayInfo();
     loadMonthView(state.currentYear, state.currentMonth);
   });
 
   // Year navigation
   $('prev-year')?.addEventListener('click', () => {
     state.yearViewYear--;
+    $('year-title').textContent = state.yearViewYear;
+    $('year-subtitle-mm').textContent = `မြန်မာသက္ကရာဇ် ${toMMNum(state.yearViewYear - 638)} ခုနှစ်`;
     loadYearView(state.yearViewYear);
   });
 
   $('next-year')?.addEventListener('click', () => {
     state.yearViewYear++;
+    $('year-title').textContent = state.yearViewYear;
+    $('year-subtitle-mm').textContent = `မြန်မာသက္ကရာဇ် ${toMMNum(state.yearViewYear - 638)} ခုနှစ်`;
     loadYearView(state.yearViewYear);
   });
 
   $('goto-year-today')?.addEventListener('click', () => {
     state.yearViewYear = new Date().getFullYear();
+    $('year-title').textContent = state.yearViewYear;
+    $('year-subtitle-mm').textContent = `မြန်မာသက္ကရာဇ် ${toMMNum(state.yearViewYear - 638)} ခုနှစ်`;
     loadYearView(state.yearViewYear);
   });
 
-  // Date converter
+  // Auspicious Finder Purpose buttons
+  $$('.purpose-card').forEach(card => {
+    card.addEventListener('click', () => {
+      $$('.purpose-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      state.finderPurpose = card.dataset.purpose;
+      searchAuspiciousDates();
+    });
+  });
+
+  $('finder-search-btn')?.addEventListener('click', () => searchAuspiciousDates());
+
+  // Date Converter
   $('convert-to-myanmar')?.addEventListener('click', convertToMyanmar);
   $('convert-to-gregorian')?.addEventListener('click', convertToGregorian);
 
-  // Gregorian input auto-convert
-  $('gregorian-input')?.addEventListener('change', () => {
-    if ($('gregorian-input').value) convertToMyanmar();
-  });
-
-  // Set today's date as default in converter
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  const gregInput = $('gregorian-input');
-  if (gregInput) gregInput.value = todayStr;
-  const birthInput = $('birth-date-input');
-  if (birthInput) birthInput.value = todayStr;
-
-  // Mahabote calculator
-  $('calc-mahabote')?.addEventListener('click', calculateMahabote);
-
-  // Festivals year selector
+  // Festivals year change
   $('festivals-year-select')?.addEventListener('change', (e) => {
-    state.festivalsYear = parseInt(e.target.value);
+    state.festivalsYear = parseInt(e.target.value, 10);
     loadFestivals(state.festivalsYear);
   });
+
+  // iCal export buttons
+  $('export-month-ics')?.addEventListener('click', () => exportIcal(state.currentYear));
+  $('export-festivals-ics')?.addEventListener('click', () => exportIcal(state.festivalsYear));
+
+  // Astrology Wednesday AM/PM toggle
+  $('wed-am-btn')?.addEventListener('click', () => {
+    $('wed-am-btn').classList.add('active');
+    $('wed-pm-btn').classList.remove('active');
+    state.isWednesdayPM = false;
+    calculateMahaboteChart();
+  });
+
+  $('wed-pm-btn')?.addEventListener('click', () => {
+    $('wed-pm-btn').classList.add('active');
+    $('wed-am-btn').classList.remove('active');
+    state.isWednesdayPM = true;
+    calculateMahaboteChart();
+  });
+
+  $('calc-mahabote')?.addEventListener('click', calculateMahaboteChart);
+
+  // Desktop notification test button
+  $('notify-test-btn')?.addEventListener('click', async () => {
+    if (state.todayInfo) {
+      await window.myanmarCalendar.sendNotification({
+        title: `🗓️ ${state.todayInfo.formatted.myanmarDateMM}`,
+        body: `${state.todayInfo.formatted.fullDateMM} • Signs: ${state.todayInfo.auspicious.signsMM.join(', ') || 'Regular Day'}`,
+      });
+      showToast('🔔 Notification sent to macOS Notification Center');
+    }
+  });
+
+  // Theme toggle
+  $('theme-toggle')?.addEventListener('click', toggleTheme);
 
   // Modal close
   $('modal-close')?.addEventListener('click', closeModal);
@@ -839,26 +1016,80 @@ function setupEventListeners() {
     if (e.target === $('modal-overlay')) closeModal();
   });
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (Escape to close modal, arrows for month navigation)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
-    if (e.key === 'ArrowLeft' && state.currentView === 'month') {
-      $('prev-month')?.click();
-    }
-    if (e.key === 'ArrowRight' && state.currentView === 'month') {
-      $('next-month')?.click();
+    if (state.currentView === 'month' && !$('modal-overlay').classList.contains('visible')) {
+      if (e.key === 'ArrowLeft') $('prev-month')?.click();
+      if (e.key === 'ArrowRight') $('next-month')?.click();
     }
   });
 
-  // Theme toggle
-  $('theme-toggle')?.addEventListener('click', toggleTheme);
+  // Automatic date rollover check (every 30 seconds & on window focus)
+  function checkDateRollover() {
+    const now = new Date();
+    if (state.todayInfo && state.todayInfo.gregorian) {
+      if (state.todayInfo.gregorian.day !== now.getDate() ||
+          state.todayInfo.gregorian.month !== (now.getMonth() + 1) ||
+          state.todayInfo.gregorian.year !== now.getFullYear()) {
+        loadTodayInfo();
+        if (state.currentView === 'month' &&
+            state.currentYear === now.getFullYear() &&
+            state.currentMonth === (now.getMonth() + 1)) {
+          loadMonthView(state.currentYear, state.currentMonth);
+        }
+      }
+    }
+  }
+  setInterval(checkDateRollover, 30000);
+  window.addEventListener('focus', checkDateRollover);
 }
 
-function closeModal() {
-  $('modal-overlay').classList.remove('visible');
+// Year View Rendering
+function renderYearView(data) {
+  const container = $('year-grid');
+  if (!container || !data || !data.months) return;
+  container.innerHTML = '';
+
+  data.months.forEach(m => {
+    const monthCard = document.createElement('div');
+    monthCard.className = 'year-month-card glass-card';
+
+    let daysHtml = '';
+    m.days.forEach(d => {
+      let dotCls = '';
+      if (d.auspicious.isYatyaza) dotCls = 'yatyaza';
+      else if (d.auspicious.isPyathada) dotCls = 'pyathada';
+      else if (d.holidays && d.holidays.length > 0) dotCls = 'holiday';
+
+      daysHtml += `
+        <div class="mini-day${d.isToday ? ' today' : ''}" title="${d.formatted.myanmarDateMM}">
+          ${d.gregorian.day}
+          ${dotCls ? `<span class="mini-dot ${dotCls}"></span>` : ''}
+        </div>
+      `;
+    });
+
+    monthCard.innerHTML = `
+      <div class="year-month-header">
+        <h4>${GREGORIAN_MONTHS[m.month - 1]}</h4>
+        <span class="year-month-mm">${m.primaryMMMonthMM}</span>
+      </div>
+      <div class="mini-calendar-grid">
+        ${daysHtml}
+      </div>
+    `;
+
+    monthCard.addEventListener('click', () => {
+      state.currentYear = data.year;
+      state.currentMonth = m.month;
+      switchView('month');
+      loadMonthView(state.currentYear, state.currentMonth);
+    });
+
+    container.appendChild(monthCard);
+  });
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  init().catch(console.error);
-});
+// ─── Entry Point ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', init);
