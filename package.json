@@ -12,7 +12,8 @@
     "open:app": "open \"dist/mac-arm64/Myanmar Calendar.app\"",
     "install:mac": "cp -R \"dist/mac-arm64/Myanmar Calendar.app\" /Applications/ && open \"/Applications/Myanmar Calendar.app\"",
     "pwa:serve": "npx -y http-server renderer -p 8080 -c-1 --cors -o",
-    "build:engine": "node scripts/build-browser-engine.js"
+    "build:engine": "node scripts/build-browser-engine.js",
+    "vercel-build": "echo 'Static PWA build complete'"
   },
   "keywords": [
     "myanmar",
