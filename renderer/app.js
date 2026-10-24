@@ -1214,6 +1214,100 @@ function setupEventListeners() {
     $('pwa-install-banner')?.setAttribute('hidden', '');
     showToast('🎉 Myanmar Calendar installed successfully!');
   });
+
+  // ── Astrology Toggle Bar & Step Navigation ──────────────────────────
+  $$('.astro-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchAstroPanel(btn.dataset.target);
+    });
+  });
+
+  $$('.panel-nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.nav) switchAstroPanel(btn.dataset.nav);
+    });
+  });
+
+  // ── Converter Mode Toggle ───────────────────────────────────────────
+  $$('.converter-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchConverterPanel(btn.dataset.target);
+    });
+  });
+
+  // ── Mobile Touch Swipe for Astrology Panels ─────────────────────────
+  const astroContainer = document.querySelector('.astro-container');
+  if (astroContainer) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const panelsList = ['panel-mahabote', 'panel-nakhat', 'panel-beings', 'panel-thingyan', 'panel-auspicious'];
+
+    astroContainer.addEventListener('touchstart', (e) => {
+      if (e.changedTouches && e.changedTouches[0]) {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }
+    }, { passive: true });
+
+    astroContainer.addEventListener('touchend', (e) => {
+      if (!e.changedTouches || !e.changedTouches[0]) return;
+      const diffX = e.changedTouches[0].screenX - touchStartX;
+      const diffY = e.changedTouches[0].screenY - touchStartY;
+
+      // Horizontal swipe threshold: > 60px and more horizontal than vertical
+      if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.4) {
+        const currentActive = document.querySelector('.astro-panel.active');
+        const currentId = currentActive ? currentActive.id : 'panel-mahabote';
+        const currentIdx = panelsList.indexOf(currentId);
+        if (diffX < 0 && currentIdx < panelsList.length - 1) {
+          switchAstroPanel(panelsList[currentIdx + 1]);
+        } else if (diffX > 0 && currentIdx > 0) {
+          switchAstroPanel(panelsList[currentIdx - 1]);
+        }
+      }
+    }, { passive: true });
+  }
+}
+
+function switchAstroPanel(panelId) {
+  const targetBtn = document.querySelector(`.astro-toggle-btn[data-target="${panelId}"]`);
+  const targetPanel = document.getElementById(panelId);
+  if (!targetPanel) return;
+
+  $$('.astro-toggle-btn').forEach(btn => {
+    const isActive = btn === targetBtn;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+
+  $$('.astro-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === panelId);
+  });
+
+  if (targetBtn) {
+    targetBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+
+  const container = document.querySelector('.astro-container');
+  if (container) {
+    container.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function switchConverterPanel(panelId) {
+  const targetBtn = document.querySelector(`.converter-toggle-btn[data-target="${panelId}"]`);
+  const targetPanel = document.getElementById(panelId);
+  if (!targetPanel) return;
+
+  $$('.converter-toggle-btn').forEach(btn => {
+    const isActive = btn === targetBtn;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+
+  $$('.converter-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === panelId);
+  });
 }
 
 // Year View Rendering

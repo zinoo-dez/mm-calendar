@@ -1215,15 +1215,57 @@ html, body {
 .mini-dot.full-moon { background: var(--full-moon-color); }
 .mini-dot.sabbath   { background: var(--sabbath-color); }
 
+/* ── Converter Mode Toggle Bar ────────────────────────────── */
+.converter-toggle-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 4px 28px 16px;
+}
+.converter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border-radius: 9999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--bg-glass-border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.converter-toggle-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+.converter-toggle-btn.active {
+  background: var(--accent-gradient, linear-gradient(135deg, #f4b942, #e09612));
+  color: #1a160d;
+  border-color: rgba(244, 185, 66, 0.6);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(244, 185, 66, 0.3);
+  transform: translateY(-1px);
+}
+.converter-panel {
+  display: none;
+  width: 100%;
+}
+.converter-panel.active {
+  display: block;
+  animation: panelSlideFade 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* ── Converter ────────────────────────────────────────────────── */
 .converter-container {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 28px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 20px;
-  align-items: start;
+  padding: 8px 28px 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .converter-card {
@@ -1477,22 +1519,142 @@ html, body {
   border: 1px solid rgba(167,139,250,0.3);
 }
 
-/* ── Astrology ────────────────────────────────────────────────── */
+/* ── Astrology Section Toggle Bar ────────────────────────────── */
+.astro-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 28px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+.astro-toggle-bar::-webkit-scrollbar {
+  display: none;
+}
+.astro-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--bg-glass-border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+.astro-toggle-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: rgba(244, 185, 66, 0.3);
+}
+.astro-toggle-btn.active {
+  background: var(--accent-gradient, linear-gradient(135deg, #f4b942, #e09612));
+  color: #1a160d;
+  border-color: rgba(244, 185, 66, 0.7);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(244, 185, 66, 0.35);
+  transform: translateY(-1px);
+}
+.astro-toggle-btn .toggle-icon {
+  font-size: 15px;
+}
+.astro-toggle-btn .toggle-labels {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.astro-toggle-btn .toggle-main {
+  font-size: 13px;
+}
+.astro-toggle-btn .toggle-sub {
+  font-size: 10px;
+  opacity: 0.8;
+  font-family: var(--font-myanmar);
+}
+.astro-toggle-btn.active .toggle-sub {
+  opacity: 0.95;
+  color: #2b2005;
+}
+
+/* ── Astrology Panels & Step Nav ────────────────────────────── */
 .astro-container {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 28px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  padding: 0 28px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.astro-panel {
+  display: none;
+  width: 100%;
+}
+.astro-panel.active {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-content: start;
+  width: 100%;
+  animation: panelSlideFade 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.panel-nav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bg-glass-border);
+}
+.panel-step-indicator {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.panel-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--bg-glass-border);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+.panel-nav-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+.panel-nav-btn.next {
+  margin-left: auto;
+  background: rgba(244, 185, 66, 0.12);
+  border-color: rgba(244, 185, 66, 0.35);
+  color: var(--accent-primary);
+}
+.panel-nav-btn.next:hover {
+  background: var(--accent-primary);
+  color: #1a160d;
 }
 
 .astro-card {
   padding: 22px;
-}
-.astro-card.full-width {
-  grid-column: 1 / -1;
+  width: 100%;
 }
 .astro-card h3 {
   font-size: 14px;
@@ -1739,8 +1901,6 @@ html, body {
 @media (max-width: 1100px) {
   :root { --sidebar-width: 240px; }
   .year-grid { grid-template-columns: repeat(2, 1fr); }
-  .astro-container { grid-template-columns: 1fr; }
-  .astro-card.full-width { grid-column: 1; }
   .moon-guide-grid { grid-template-columns: repeat(2, 1fr); }
   .ausp-guide-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -2915,29 +3075,64 @@ span.flatpickr-weekday:last-child {
   .purpose-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .result-card  { padding: 12px; }
 
-  /* ── Converter: stack cards vertically ──────────────────────── */
-  .converter-container {
-    grid-template-columns: 1fr !important;
-    padding: 12px !important;
-    gap: 12px !important;
+  /* ── Converter Toggle Mobile ────────────────────────────── */
+  .converter-toggle-bar {
+    padding: 0 14px 12px !important;
+    gap: 8px !important;
   }
-  /* Divider: horizontal between stacked cards */
-  .converter-divider {
-    flex-direction: row !important;
-    padding: 0 !important;
-  }
-  .converter-divider .divider-line {
-    height: 1px !important;
-    width: auto !important;
+  .converter-toggle-btn {
     flex: 1 !important;
+    justify-content: center !important;
+    padding: 9px 10px !important;
+    font-size: 12px !important;
   }
-  /* Inner Myanmar year+month row: also stack */
+  .converter-container {
+    display: block !important;
+    padding: 0 14px 20px !important;
+  }
+  /* Inner Myanmar year+month row: stack cleanly */
   .converter-row,
   .moon-input-row {
     grid-template-columns: 1fr !important;
     gap: 10px !important;
   }
   .converter-card { padding: 16px !important; }
+
+  /* ── Astrology Toggle Mobile ─────────────────────────────── */
+  .astro-toggle-bar {
+    padding: 0 12px 12px !important;
+    gap: 6px !important;
+  }
+  .astro-toggle-btn {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+  }
+  .astro-toggle-btn .toggle-main {
+    font-size: 12px !important;
+  }
+  .astro-toggle-btn .toggle-sub {
+    font-size: 9px !important;
+  }
+  .astro-container {
+    padding: 0 12px 24px !important;
+  }
+  .astro-card {
+    padding: 16px 14px !important;
+  }
+  .panel-nav-footer {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .panel-nav-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+  }
+  .panel-step-indicator {
+    text-align: center !important;
+  }
 
   /* ── Astrology mansion grid: single column, horizontal cards ─── */
   .mansions-grid,
