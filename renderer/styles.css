@@ -2162,9 +2162,10 @@ html, body {
 
 .finder-result-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px 18px;
   border-radius: var(--border-radius);
   background: var(--bg-card);
   border: 1px solid var(--bg-glass-border);
@@ -2175,13 +2176,14 @@ html, body {
 .finder-result-item:hover {
   background: var(--bg-card-hover);
   border-color: rgba(244, 185, 66, 0.3);
-  transform: translateX(4px);
+  transform: translateY(-2px);
 }
 
 .result-date-col {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  width: 100%;
 }
 .result-gregorian-text {
   font-size: 15px;
@@ -2192,6 +2194,7 @@ html, body {
   font-size: 13px;
   color: var(--accent-primary);
   font-family: var(--font-myanmar);
+  line-height: 1.4;
 }
 .result-english-sub {
   font-size: 11px;
@@ -2202,7 +2205,8 @@ html, body {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-width: 50%;
+  width: 100%;
+  max-width: 100%;
 }
 .reason-tag {
   font-size: 11px;
@@ -2212,6 +2216,9 @@ html, body {
   background: var(--yatyaza-bg);
   color: var(--yatyaza-color);
   border: 1px solid rgba(74, 222, 128, 0.3);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
 }
 .caution-tag {
   font-size: 11px;
@@ -2221,24 +2228,36 @@ html, body {
   background: var(--pyathada-bg);
   color: var(--pyathada-color);
   border: 1px solid rgba(248, 113, 113, 0.3);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
 }
 
 .result-score-col {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
-.score-badge {
-  font-size: 14px;
+.result-score-col .score-label {
+  order: 1;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.result-score-col .score-badge {
+  order: 2;
+  font-size: 13px;
   font-weight: 800;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 8px;
   background: rgba(244, 185, 66, 0.15);
   color: var(--accent-primary);
   border: 1px solid rgba(244, 185, 66, 0.4);
 }
-.score-label { font-size: 10px; color: var(--text-muted); }
 
 /* ── 8-Mansion Astrology Styles ──────────────────────────────── */
 .astro-card-header {
@@ -3073,7 +3092,8 @@ span.flatpickr-weekday:last-child {
     padding: 10px;
   }
   .purpose-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .result-card  { padding: 12px; }
+  .result-card,
+  .finder-result-item { padding: 14px; gap: 10px; }
 
   /* ── Converter Toggle Mobile ────────────────────────────── */
   .converter-toggle-bar {

@@ -5,7 +5,7 @@
 
 'use strict';
 
-const CACHE_VERSION = 'myanmar-cal-v2.0.2';
+const CACHE_VERSION = 'myanmar-cal-v2.0.3';
 const FONT_CACHE = 'myanmar-fonts-v1';
 
 const APP_SHELL = [

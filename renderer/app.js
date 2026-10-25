@@ -661,8 +661,8 @@ async function searchAuspiciousDates() {
           ${cautionsHtml}
         </div>
         <div class="result-score-col">
-          <div class="score-badge">${res.score}</div>
           <div class="score-label">Favorable Score</div>
+          <div class="score-badge">${res.score}</div>
         </div>
       `;
 
