@@ -3,7 +3,6 @@ dist
 .git
 assets
 tests
-src
 main.js
 preload.js
 .DS_Store

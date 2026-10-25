@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "myanmar-calendar",
   "framework": null,
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "renderer",

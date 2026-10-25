@@ -11,6 +11,14 @@ const path = require('path');
 const srcPath = path.join(__dirname, '..', 'src', 'myanmar-calendar-engine.js');
 const outPath = path.join(__dirname, '..', 'renderer', 'myanmar-engine.js');
 
+if (!fs.existsSync(srcPath)) {
+  if (fs.existsSync(outPath)) {
+    console.log('ℹ️ src/myanmar-calendar-engine.js not found in build environment; using existing pre-built bundle.');
+    process.exit(0);
+  }
+  throw new Error(`Engine source not found at: ${srcPath}`);
+}
+
 const engineSrc = fs.readFileSync(srcPath, 'utf8');
 
 // Strip 'use strict' and the CommonJS module.exports block

@@ -282,7 +282,8 @@ function renderSidebarToday(info) {
   // Buddhist Era (Sasana Year) Badge
   const sasanaBadge = $('today-sasana-badge');
   if (sasanaBadge) {
-    sasanaBadge.textContent = `${m.sasanaYear} BE (သာသနာနှစ် ${toMMNum(m.sasanaYear)})`;
+    sasanaBadge.textContent = `${m.sasanaYear} BE`;
+    sasanaBadge.title = `Buddhist Era (သာသနာနှစ် ${toMMNum(m.sasanaYear)} BE)`;
   }
 
   // Myanmar Year
@@ -299,10 +300,12 @@ function renderSidebarToday(info) {
   const sabbathBadge = $('today-sabbath-badge');
   if (sabbathBadge) {
     if (aup.sabbath === 1) {
-      sabbathBadge.textContent = '☸️ ဥပုသ်နေ့ (Sabbath)';
+      sabbathBadge.textContent = '☸️ ဥပုသ်နေ့';
+      sabbathBadge.title = 'Uposatha Sabbath (ဥပုသ်နေ့)';
       sabbathBadge.classList.add('visible');
     } else if (aup.sabbath === 2) {
-      sabbathBadge.textContent = '☸️ အဖိတ်နေ့ (Eve)';
+      sabbathBadge.textContent = '☸️ အဖိတ်နေ့';
+      sabbathBadge.title = 'Sabbath Eve (အဖိတ်နေ့)';
       sabbathBadge.classList.add('visible');
     } else {
       sabbathBadge.classList.remove('visible');
