@@ -499,11 +499,22 @@ function getMahaboteRuler(weekday, isWednesdayPM = false) {
 
 /**
  * 8-Mansion Astrology (မဟာဘုတ် ၈ ပိုင်း / အဓိပတိ၊ ဗင်္ဃ၊ အသွဉ် စသည်)
- * Computes complete life-chart mansions for a birth year & weekday
+ * Computes complete life-chart mansions for a birth year & weekday (or a date input)
  */
-function get8MansionChart(my, weekday, isWednesdayPM = false) {
-  const ruler = getMahaboteRuler(weekday, isWednesdayPM);
-  const houseData = cal_mahabote_house(my, weekday);
+function get8MansionChart(myOrDate, weekday, isWednesdayPM = false) {
+  let my = myOrDate;
+  let stdWeekday = weekday;
+
+  if (typeof myOrDate === 'string' || myOrDate instanceof Date || (typeof myOrDate === 'object' && myOrDate !== null && myOrDate.year && myOrDate.month)) {
+    const info = getMyanmarDate(myOrDate);
+    my = info.myanmar.year;
+    stdWeekday = info.gregorian.weekday;
+  }
+
+  const ruler = getMahaboteRuler(stdWeekday, isWednesdayPM);
+  // Convert standard Gregorian weekday (0=Sun..6=Sat) to Myanmar astrological weekday (0=Sat, 1=Sun, 2=Mon..6=Fri)
+  const wd_mm = (stdWeekday + 1) % 7;
+  const houseData = cal_mahabote_house(my, wd_mm);
 
   // House positions in traditional 7-house chart:
   // Order: Binga, Atun, Yaza, Adipati, Marana, Thike, Puti
@@ -518,15 +529,26 @@ function get8MansionChart(my, weekday, isWednesdayPM = false) {
   ];
 
   return {
-    birthWeekday: weekday,
+    birthWeekday: stdWeekday,
     isWednesdayPM,
     ruler,
     birthHouse: houseData,
-    mansions: mansionOrder.map((m, idx) => ({
-      ...m,
-      isBirthHouse: m.key === houseData.house,
-      planetRuler: PLANETARY_RULERS[(weekday + idx) % 7]?.planetMM || ''
-    }))
+    mansions: mansionOrder.map((m, idx) => {
+      // Traditional Mahabote house-planet placement for year 'my':
+      // House 'idx' is occupied by the planet with astrological day ((my - idx) % 7 + 7) % 7
+      const planetWd = ((my - idx) % 7 + 7) % 7; // 0=Sat, 1=Sun, 2=Mon, 3=Tue, 4=Wed, 5=Thu, 6=Fri
+      const stdDay = (planetWd + 6) % 7;         // 0=Sun, 1=Mon, ..., 6=Sat
+      const isBirthHouse = m.key === houseData.house;
+      const mansionRuler = (isBirthHouse && stdWeekday === 3 && isWednesdayPM)
+        ? PLANETARY_RULERS['rahu']
+        : PLANETARY_RULERS[stdDay];
+
+      return {
+        ...m,
+        isBirthHouse,
+        planetRuler: mansionRuler?.planetMM || ''
+      };
+    })
   };
 }
 

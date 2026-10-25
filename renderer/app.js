@@ -862,7 +862,7 @@ function renderNakhatGrid() {
   grid.innerHTML = '';
 
   const today = new Date();
-  const currentMyanmarYear = today.getFullYear() - 638;
+  const currentMyanmarYear = state.todayInfo?.myanmar?.year || (today.getFullYear() - 638);
   const currentNakhatIdx = ((currentMyanmarYear % 12) + 12) % 12;
 
   NAKHAT_12.forEach((animal, idx) => {
@@ -886,11 +886,30 @@ async function calculateMahaboteChart() {
     return;
   }
 
-  const date = new Date(birthInput);
-  const weekday = date.getDay(); // 0=Sun..6=Sat
-  const my = date.getFullYear() - 638;
-
   try {
+    const info = await window.myanmarCalendar.getMyanmarDate(birthInput);
+    if (!info || !info.myanmar) {
+      showToast('Could not calculate Myanmar date for birth date.');
+      return;
+    }
+
+    const my = info.myanmar.year;
+    const weekday = info.gregorian.weekday;
+
+    // Visual feedback for Wednesday AM/PM toggle (only relevant on Wednesday)
+    const wedGroup = $('wed-am-btn')?.parentElement;
+    if (wedGroup) {
+      if (weekday === 3) {
+        wedGroup.style.opacity = '1';
+        wedGroup.style.pointerEvents = 'auto';
+        wedGroup.removeAttribute('title');
+      } else {
+        wedGroup.style.opacity = '0.5';
+        wedGroup.style.pointerEvents = 'none';
+        wedGroup.title = 'Only applicable for Wednesday births (ဗုဒ္ဓဟူးနေ့ဖွားများအတွက်သာ)';
+      }
+    }
+
     const chart = await window.myanmarCalendar.get8MansionChart(my, weekday, state.isWednesdayPM);
     if (!chart || !chart.ruler) return;
 
@@ -910,6 +929,14 @@ async function calculateMahaboteChart() {
 
     container.innerHTML = `
       <div class="mahabote-header-summary">
+        <div class="summary-pill">
+          <div class="summary-pill-label">Myanmar Year (မြန်မာသက္ကရာဇ်)</div>
+          <div class="summary-pill-val">${my} ME (${info.formatted.myanmarDateMM})</div>
+        </div>
+        <div class="summary-pill">
+          <div class="summary-pill-label">Birth House (မဟာဘုတ်အိမ်)</div>
+          <div class="summary-pill-val" style="color:var(--accent-primary);font-weight:700;">${chart.birthHouse.houseMM} (${chart.birthHouse.house})</div>
+        </div>
         <div class="summary-pill">
           <div class="summary-pill-label">Planetary Ruler (ဂြိုဟ်မင်း)</div>
           <div class="summary-pill-val" style="color:${ruler.color}">${ruler.name} (${ruler.planetMM})</div>

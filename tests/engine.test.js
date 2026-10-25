@@ -186,6 +186,32 @@ test('iCal export generates valid VCALENDAR payload', () => {
   assert.ok(ics.includes('Independence Day'), 'Contains public holidays');
 });
 
+// ─── Test 11: Mahabote House Consistency ──────────────────────────────────────
+test('Mahabote house consistency between getMyanmarDate and get8MansionChart', () => {
+  // Test case from user: Jan 30, 1989 (Monday, 1350 ME)
+  const info1989 = engine.getMyanmarDate('1989-01-30');
+  assert.strictEqual(info1989.myanmar.year, 1350, 'Jan 30 1989 must be 1350 ME (before Thingyan)');
+  assert.strictEqual(info1989.gregorian.weekday, 1, 'Jan 30 1989 must be Monday');
+  assert.strictEqual(info1989.auspicious.mahabote, 'Marana', 'Mahabote house must be Marana');
+  assert.strictEqual(info1989.auspicious.mahaboteMM, 'မာရဏ', 'Mahabote house MM must be မာရဏ');
+
+  // get8MansionChart using year and weekday
+  const chart1 = engine.get8MansionChart(1350, 1);
+  assert.strictEqual(chart1.birthHouse.house, 'Marana', 'get8MansionChart(1350, 1) must be Marana');
+  assert.strictEqual(chart1.birthHouse.houseMM, 'မာရဏ', 'get8MansionChart(1350, 1) MM must be မာရဏ');
+
+  // get8MansionChart using date string
+  const chartDate = engine.get8MansionChart('1989-01-30');
+  assert.strictEqual(chartDate.birthHouse.house, 'Marana', 'get8MansionChart("1989-01-30") must be Marana');
+  assert.strictEqual(chartDate.birthHouse.houseMM, 'မာရဏ', 'get8MansionChart("1989-01-30") MM must be မာရဏ');
+
+  // Verify the birth house is flagged and ruled by Moon (လမင်း)
+  const maranaMansion = chart1.mansions.find(m => m.key === 'Marana');
+  assert.strictEqual(maranaMansion.isBirthHouse, true, 'Marana mansion must be birth house');
+  assert.strictEqual(maranaMansion.planetRuler, 'လမင်း', 'Marana mansion ruler must be Moon for Monday in 1350 ME');
+});
+
+
 console.log(`\n========================================`);
 console.log(`Test Results: ${passedTests}/${totalTests} tests passed`);
 console.log(`========================================\n`);

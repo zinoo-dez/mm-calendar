@@ -71,7 +71,7 @@ function createTray() {
     trayIcon = nativeImage.createFromDataURL(getDefaultTrayIcon());
   }
 
-  tray = new Tray(trayIcon.resize({ width: 18, height: 18 }));
+  tray = new Tray(trayIcon.resize({ width: 18, height: 18, quality: 'best' }));
 
   updateTrayTitle();
   setInterval(updateTrayTitle, 60000); // Update every minute
@@ -134,9 +134,8 @@ function createTray() {
 function updateTrayTitle() {
   const today = new Date();
   const mmd = engine.getMyanmarDate(today);
-  const title = ` ${mmd.myanmar.year} ME`;
   if (tray) {
-    tray.setTitle(title);
+    tray.setTitle('');
     tray.setToolTip(`Myanmar Calendar — ${mmd.formatted.myanmarDate} (${mmd.myanmar.sasanaYear} BE)`);
   }
 }
